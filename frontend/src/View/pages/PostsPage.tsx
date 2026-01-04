@@ -1,4 +1,5 @@
 import { useMemo } from "react";
+import { useNavigate, useLocation } from 'react-router-dom';
 import type { LostFoundPost } from "../../Domain/Entities/LostFoundPost";
 import { PostCard } from "../components/posts/PostCard";
 
@@ -7,6 +8,9 @@ import logo from "../assets/logo.png";
 const HEADER_H = 110;
 
 export function PostsPage() {
+    const navigate = useNavigate();
+    const location = useLocation();
+
     // sample data
     const posts: LostFoundPost[] = useMemo(
         () => [
@@ -87,7 +91,8 @@ export function PostsPage() {
     );
 
     return (
-        <div dir="rtl" className="min-h-screen">
+        <div dir="rtl"
+             className="min-h-screen flex items-center justify-center bg-[linear-gradient(45deg,rgba(18,24,43,0.5)_0%,rgba(16,21,39,0.77)_0%,rgba(15,19,36,1)_63%,rgba(14,18,34,0.77)_100%,rgba(11,15,26,0)_100%)]">
             {/* Fixed full background */}
             <div className="fixed inset-0 -z-10 bg-[linear-gradient(135deg,#0b0f1a,#12182b,#0f1324)]"/>
 
@@ -113,7 +118,7 @@ export function PostsPage() {
                                 <button
                                     type="button"
                                     className="rounded-full bg-white/8 px-4 py-2 text-ink-1 ring-1 ring-white/10 hover:bg-white/10"
-                                    onClick={() => console.log("exit")}
+                                    onClick={() => navigate('/')}
                                     title="خروج"
                                 >
                                     خروج
