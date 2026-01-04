@@ -1,11 +1,13 @@
 import { StrictMode } from 'react'
 import { createRoot } from 'react-dom/client'
-import { BrowserRouter } from 'react-router-dom' // ۱. این خط را اضافه کنید
+import { BrowserRouter } from 'react-router-dom' 
 import MapView from './View/pages/MapView/MapView'
+import Navbar from './View/components/navbar/Navbar'
 
 createRoot(document.getElementById('root')!).render(
   <StrictMode>
-    <BrowserRouter> {/* ۲. دور مپ ویو را با این تگ بپوشانید */}
+    <BrowserRouter> 
+      <Navbar />
       <MapView />
     </BrowserRouter>
   </StrictMode>,
