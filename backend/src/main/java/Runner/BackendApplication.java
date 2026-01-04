@@ -8,7 +8,6 @@ import org.springframework.cache.annotation.EnableCaching;
 import org.springframework.context.annotation.ComponentScan;
 import org.springframework.data.jpa.repository.config.EnableJpaAuditing;
 import org.springframework.data.jpa.repository.config.EnableJpaRepositories;
-import service.repository.ItemRepository;
 
 @SpringBootApplication
 @EnableCaching
@@ -21,8 +20,7 @@ public class BackendApplication {
 
     public static void main(String[] args) {
         log.info("Starting Lost and Found Backend Application...");
-        var res = SpringApplication.run(BackendApplication.class, args);
-        System.out.println(res.getBean(ItemRepository.class).findAll());
+         SpringApplication.run(BackendApplication.class, args);
         log.info("Lost and Found Backend Application started successfully!");
     }
 

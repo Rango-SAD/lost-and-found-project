@@ -14,9 +14,9 @@ public class FlywayConfig {
         return Flyway.configure()
                 .dataSource(dataSource)
                 .locations("classpath:db/migration")
-                .baselineOnMigrate(true)
-                .validateOnMigrate(true)
                 .validateMigrationNaming(true)
+                .failOnMissingLocations(true)
+                .ignoreMigrationPatterns("*:missing")
                 .load();
     }
 }
