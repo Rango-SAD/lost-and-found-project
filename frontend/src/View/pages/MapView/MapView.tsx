@@ -22,7 +22,7 @@ const MapView = () => {
 
       <button 
         onClick={() => navigate("/")}
-        className="fixed top-8 left-8 z-[3000] bg-white/5 backdrop-blur-xl border border-white/10 px-5 py-2 rounded-full hover:text-white transition-all text-xs"
+        className="fixed bottom-8 left-8 z-[3000] bg-white/5 backdrop-blur-xl border border-white/10 px-5 py-2 rounded-full hover:text-white transition-all text-xs"
         style={{ color: '#aab0d6' }}
       >
         ← بازگشت به فرم
