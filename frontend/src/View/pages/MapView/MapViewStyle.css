@@ -1,0 +1,49 @@
+@import "tailwindcss";
+
+#root, body, html {
+    height: 100%;
+    margin: 0;
+    background: linear-gradient(135deg, #0b0f1a, #12182b, #0f1324);
+}
+
+.map-wrapper {
+    position: relative;
+    width: 100%;
+    overflow: hidden;
+    height: 65vh;
+    min-height: 480px;
+    background: rgba(15, 23, 42, 0.3);
+    backdrop-filter: blur(12px);
+    border: 1px solid rgba(59, 130, 246, 0.6) !important;
+    border-radius: 2.5rem;
+    padding: 10px;
+    box-shadow: 0 0 30px rgba(59, 130, 246, 0.2);
+}
+
+.leaflet-container {
+    width: 100%;
+    height: 100%;
+    border-radius: 2rem;
+    background: linear-gradient(135deg, #0b0f1a, #12182b, #0f1324) !important;
+}
+
+.neon-label {
+    background: transparent !important;
+    border: none !important;
+    box-shadow: none !important;
+    color: #93c5fd !important;
+    font-weight: 600;
+    font-size: 11px;
+    text-shadow: 0 0 8px rgba(0,0,0,1), 0 0 4px rgba(59,130,246,0.8);
+    white-space: nowrap;
+}
+
+.neon-label::before { display: none !important; }
+
+/* کلاسی که به div اصلی نقشه در MapView.tsx داده‌ای */
+.map-container {
+    height: 100vh; /* این یعنی کل ارتفاع صفحه را بگیرد */
+    width: 100%;
+    margin: 0;
+    padding: 0;
+}
