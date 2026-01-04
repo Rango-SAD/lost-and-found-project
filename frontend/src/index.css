@@ -39,3 +39,19 @@ body {
 *::-webkit-scrollbar-thumb:hover {
   background: rgba(160,177,225,0.5);
 }
+
+@keyframes toast-in {
+  from {
+    transform: translateX(-120%);
+    opacity: 0;
+  }
+  to {
+    transform: translateX(0);
+    opacity: 1;
+  }
+}
+
+.animate-toast-in {
+  animation: toast-in 0.45s ease-out forwards;
+}
+

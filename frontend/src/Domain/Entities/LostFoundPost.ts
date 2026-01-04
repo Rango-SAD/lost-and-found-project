@@ -15,4 +15,6 @@ export type LostFoundPost = {
 
     publisherName?: string;
     publishedAt?: string;
+
+    reportCount?: number;
 };

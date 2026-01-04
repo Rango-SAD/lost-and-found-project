@@ -1,3 +1,5 @@
+import {useState} from "react";
+import {useToast} from "../ui/ToastProvider.tsx";
 import { cn } from "../../../Infrastructure/Utility/cn";
 import { GlassSurface } from "../ui/GlassSurface";
 import { CategoryBadge } from "./CategoryBadge";
@@ -9,26 +11,34 @@ function typeTitleFa(type: LostFoundPost["type"]) {
 
 type Props = {
     post: LostFoundPost;
-    onContact?: (id: string) => void;
+    onContact?: (id: string, message: string) => void;
     onReport?: (id: string) => void;
     onOpen?: (id: string) => void;
 };
 
 export function PostCard({ post, onContact, onReport, onOpen }: Props) {
+    const [reportOpen, setReportOpen] = useState(false);
+    const [contactOpen, setContactOpen] = useState(false);
+    const [message, setMessage] = useState("");
+
+    const toast = useToast();
     return (
+        <>
         <GlassSurface
             dir="rtl"
             className={cn(
-                "w-full max-w-[520px] rounded-[34px]",
-                // FIXED border for all posts: #a0b1e1 10%
+                "group w-full max-w-[520px] rounded-[34px]",
+                // base border (unchanged)
                 "border border-[rgba(160,177,225,0.10)]",
-                // glass + shadow
+                // base shadow (unchanged)
                 "shadow-[0_20px_60px_rgba(0,0,0,0.35)]",
                 "transition-all duration-200",
-                // hover: slightly lighter border + glow
-                "hover:border-[rgba(160,177,225,0.22)] hover:shadow-[0_25px_70px_rgba(0,0,0,0.42)]"
+                // HOVER: very visible light border + strong glow
+                "hover:border-[rgba(255,255,255,0.55)]",
+                "hover:shadow-[0_0_0_1px_rgba(255,255,255,0.20),0_28px_85px_rgba(0,0,0,0.55),0_0_36px_rgba(232,236,255,0.35)]"
             )}
-            onClick={onOpen ? () => onOpen(post.id) : undefined}
+
+            onClick={!reportOpen && onOpen ? () => onOpen(post.id) : undefined}
             role={onOpen ? "button" : undefined}
             tabIndex={onOpen ? 0 : undefined}
         >
@@ -164,7 +174,7 @@ export function PostCard({ post, onContact, onReport, onOpen }: Props) {
                         type="button"
                         onClick={(e) => {
                             e.stopPropagation();
-                            onContact?.(post.id);
+                            setContactOpen(true);
                         }}
                         className={cn(
                             "h-[47px] flex-1 rounded-full px-6 text-[14px] font-semibold",
@@ -186,7 +196,7 @@ export function PostCard({ post, onContact, onReport, onOpen }: Props) {
                         type="button"
                         onClick={(e) => {
                             e.stopPropagation();
-                            onReport?.(post.id);
+                            setReportOpen(true);
                         }}
                         className={cn(
                             "h-[47px] flex-1 rounded-full px-6 text-[14px] font-semibold",
@@ -205,5 +215,156 @@ export function PostCard({ post, onContact, onReport, onOpen }: Props) {
                 </div>
             </div>
         </GlassSurface>
+
+    {/* Report confirmation modal */}
+    {reportOpen ? (
+        <div
+            className="fixed inset-0 z-[999] flex items-center justify-center px-4"
+            onClick={() => setReportOpen(false)}
+        >
+            <div className="absolute inset-0 bg-black/55 backdrop-blur-sm" />
+
+            <div
+                className={cn(
+                    "relative w-full max-w-[420px] rounded-[26px]",
+                    "border border-[rgba(160,177,225,0.14)]",
+                    "bg-white/10 backdrop-blur-2xl",
+                    "ring-1 ring-white/10",
+                    "shadow-[0_25px_80px_rgba(0,0,0,0.55)]",
+                    "p-6"
+                )}
+                onClick={(e) => e.stopPropagation()}
+                role="dialog"
+                aria-modal="true"
+            >
+                <div className="text-right text-[14px] font-semibold text-[#e8ecff]">
+                    آیا از ریپورت این آگهی مطمئن هستید؟
+                </div>
+                <div className="mt-2 text-right text-[13px] text-[#aab0d6]">
+                    این اقدام برای بررسی محتوا ثبت می‌شود.
+                </div>
+
+                <div className="mt-6 flex items-center justify-between gap-3">
+                    <button
+                        type="button"
+                        className={cn(
+                            "h-11 flex-1 rounded-full px-6 text-[14px] font-semibold",
+                            "bg-[rgba(15,82,186,0.18)] text-[#e8ecff]",
+                            "ring-1 ring-[rgba(255,255,255,0.14)]",
+                            "hover:bg-[rgba(15,82,186,0.26)] hover:ring-[rgba(255,255,255,0.20)]"
+                        )}
+                        onClick={() => setReportOpen(false)}
+                    >
+                        خیر
+                    </button>
+
+                    <button
+                        type="button"
+                        className={cn(
+                            "h-11 flex-1 rounded-full px-6 text-[14px] font-semibold",
+                            "bg-[rgba(184,58,45,0.18)] text-[#e8ecff]",
+                            "ring-1 ring-[rgba(255,255,255,0.14)]",
+                            "hover:bg-[rgba(184,58,45,0.26)] hover:ring-[rgba(255,255,255,0.20)]"
+                        )}
+                        onClick={() => {
+                            setReportOpen(false);
+                            onReport?.(post.id);
+                            toast.push("ریپورت شما ثبت شد.")
+                        }}
+                    >
+                        بله
+                    </button>
+                </div>
+            </div>
+        </div>
+    ) : null}
+            {/* Contact modal */}
+            {contactOpen ? (
+                <div
+                    className="fixed inset-0 z-[999] flex items-center justify-center px-4"
+                    onClick={() => setContactOpen(false)}
+                >
+                    <div className="absolute inset-0 bg-black/55 backdrop-blur-sm" />
+
+                    <div
+                        className={cn(
+                            "relative w-full max-w-[440px] rounded-[26px]",
+                            "border border-[rgba(160,177,225,0.14)]",
+                            "bg-white/10 backdrop-blur-2xl",
+                            "ring-1 ring-white/10",
+                            "shadow-[0_25px_80px_rgba(0,0,0,0.55)]",
+                            "p-6"
+                        )}
+                        onClick={(e) => e.stopPropagation()}
+                        role="dialog"
+                        aria-modal="true"
+                    >
+                        {/* Title */}
+                        <div className="text-right text-[14px] font-semibold text-[#e8ecff]">
+                            ارسال پیام
+                        </div>
+
+                        {/* Textarea */}
+                        <textarea
+                            value={message}
+                            onChange={(e) => setMessage(e.target.value)}
+                            placeholder="متن پیام"
+                            className={cn(
+                                "mt-4 w-full resize-none rounded-[18px] px-4 py-3",
+                                "bg-white/8 backdrop-blur-xl",
+                                "border border-[rgba(160,177,225,0.14)]",
+                                "ring-1 ring-white/10",
+                                "text-[13px] text-[#e8ecff]",
+                                "placeholder:text-[#6f76a8]",
+                                "focus:outline-none focus:ring-2 focus:ring-white/20"
+                            )}
+                            rows={4}
+                        />
+
+                        {/* Buttons */}
+                        <div className="mt-6 flex items-center justify-between gap-3">
+                            {/* Send */}
+                            <button
+                                type="button"
+                                disabled={!message.trim()}
+                                className={cn(
+                                    "h-11 flex-1 rounded-full px-6 text-[14px] font-semibold",
+                                    "transition-all",
+                                    message.trim()
+                                        ? "bg-[rgba(15,82,186,0.18)] text-[#e8ecff] ring-1 ring-[rgba(255,255,255,0.18)] hover:bg-[rgba(15,82,186,0.26)]"
+                                        : "bg-white/6 text-[#6f76a8] ring-1 ring-white/10 cursor-not-allowed"
+                                )}
+                                onClick={() => {
+                                    onContact?.(post.id, message.trim());
+                                    setContactOpen(false);
+                                    setMessage("");
+                                    toast.push("پیام شما ارسال شد.");
+                                }}
+                            >
+                                ارسال
+                            </button>
+
+                            {/* Cancel */}
+                            <button
+                                type="button"
+                                className={cn(
+                                    "h-11 flex-1 rounded-full px-6 text-[14px] font-semibold",
+                                    "bg-[rgba(184,58,45,0.18)] text-[#e8ecff]",
+                                    "ring-1 ring-[rgba(255,255,255,0.14)]",
+                                    "hover:bg-[rgba(184,58,45,0.26)] hover:ring-[rgba(255,255,255,0.20)]"
+                                )}
+                                onClick={() => {
+                                    setContactOpen(false);
+                                    setMessage("");
+                                }}
+                            >
+                                انصراف
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            ) : null}
+
+        </>
     );
 }

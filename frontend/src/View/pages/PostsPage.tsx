@@ -155,21 +155,26 @@ export function PostsPage() {
                 </div>
             </header>
 
-            {/* CONTENT: padded so it never goes under header */}
-            <main className="mx-auto w-full px-6 pt-[130px] pb-16">
-                {/* Grid: 3 / 2 / 1 */}
-                <div className="grid gap-8 sm:grid-cols-1 md:grid-cols-2 lg:grid-cols-3">
-                    {posts.map((p) => (
-                        <PostCard
-                            key={p.id}
-                            post={p}
-                            onContact={(id) => console.log("contact", id)}
-                            onReport={(id) => console.log("report", id)}
-                            onOpen={(id) => console.log("open", id)}
-                        />
-                    ))}
-                </div>
-            </main>
+            <div
+                className="app-scroll h-full overflow-y-auto overflow-x-hidden pr-2"
+            >
+                {/* CONTENT: padded so it never goes under header */}
+                <main className="mx-auto w-full px-6 pt-[130px] pb-16">
+                    {/* Grid: 3 / 2 / 1 */}
+                    <div className="grid gap-8 sm:grid-cols-1 md:grid-cols-2 lg:grid-cols-3 justify-items-center">
+                        {posts.map((p) => (
+                            <PostCard
+                                key={p.id}
+                                post={p}
+                                onContact={(id) => console.log("contact", id)}
+                                onReport={(id) => console.log("report", id)}
+                                onOpen={(id) => console.log("open", id)}
+                            />
+                        ))}
+                    </div>
+                </main>
+            </div>
+
         </div>
     );
 }
