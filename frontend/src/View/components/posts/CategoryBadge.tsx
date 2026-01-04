@@ -1,5 +1,5 @@
 import type { Category } from "../../../Domain/Types/post";
-import { CATEGORY_THEME } from "../../../Domain/Types/post";
+import {CATEGORY_LABEL_FA, CATEGORY_THEME} from "../../../Domain/Types/post";
 import { cn } from "../../../Infrastructure/Utility/cn";
 
 export function CategoryBadge({
@@ -10,6 +10,7 @@ export function CategoryBadge({
     className?: string;
 }) {
     const t = CATEGORY_THEME[category];
+    const labelFa = CATEGORY_LABEL_FA[category];
 
     return (
         <span
@@ -22,7 +23,7 @@ export function CategoryBadge({
                 className
             )}
         >
-      دسته بندی
+            {labelFa}
     </span>
     );
 }

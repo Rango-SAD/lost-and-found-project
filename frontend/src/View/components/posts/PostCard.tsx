@@ -4,7 +4,7 @@ import { CategoryBadge } from "./CategoryBadge";
 import type { LostFoundPost } from "../../../Domain/Entities/LostFoundPost";
 
 function typeTitleFa(type: LostFoundPost["type"]) {
-    return type === "LOST" ? "آگهی گمشده" : "آگهی پیدا شده";
+    return type === "LOST" ? "گمشده" : "پیدا شده";
 }
 
 type Props = {
