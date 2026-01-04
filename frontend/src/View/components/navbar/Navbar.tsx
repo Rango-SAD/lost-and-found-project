@@ -21,7 +21,7 @@ const Navbar: React.FC = () => {
 
             <button
                 onClick={() => navigate('/newItem')}
-                className={`nav-item ${location.pathname === '/edit' ? 'active' : ''}`}
+                className={`nav-item ${location.pathname === '/newItem' ? 'active' : ''}`}
             >
                 <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
                     <path d="M12 4v16m8-8H4" />
