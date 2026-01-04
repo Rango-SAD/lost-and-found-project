@@ -1,22 +1,22 @@
 @import "tailwindcss";
 
 .entry-page-container {
-    /* تغییر: ارتفاع فیکس صفحه و جلوگیری از اسکرول */
+   
     @apply h-screen w-full flex flex-col items-center justify-center p-4 overflow-hidden;
     background: linear-gradient(135deg, #0b0f1a, #12182b, #0f1324) !important;
 }
 
 .main-grid { 
-    /* تغییر: کاهش فاصله گرید از 8 به 3 */
+    
     @apply w-full max-w-5xl grid grid-cols-1 lg:grid-cols-12 gap-3 items-center; 
-    margin-bottom: 2rem; /* فضا برای نوبار */
+    margin-bottom: 2rem; 
 }
 
-.form-column { @apply lg:col-span-7 space-y-3; } /* تغییر: کاهش فاصله عمودی از 5 به 3 */
+.form-column { @apply lg:col-span-7 space-y-3; } 
 .media-column { @apply lg:col-span-5 space-y-3; }
 
 .neon-input-card {
-    @apply rounded-[1.2rem] overflow-visible transition-all duration-300; /* گردی کمتر */
+    @apply rounded-[1.2rem] overflow-visible transition-all duration-300; 
     background: linear-gradient(
         135deg,
         rgba(255, 255, 255, 0.08) 0%,
@@ -25,7 +25,7 @@
     backdrop-filter: blur(20px);
     border: 0 !important;
     box-shadow: 
-        0 4px 16px rgba(0, 0, 0, 0.3), /* سایه کمتر */
+        0 4px 16px rgba(0, 0, 0, 0.3), 
         inset 0 1px 0 rgba(255, 255, 255, 0.2),
         inset 0 -1px 0 rgba(0, 0, 0, 0.1);
     position: relative;
@@ -34,7 +34,7 @@
 .neon-input-card::after {
     content: '';
     position: absolute;
-    inset: -1px; /* حاشیه نازک‌تر */
+    inset: -1px; 
     border-radius: 1.2rem;
     padding: 1px;
     background: 
@@ -80,7 +80,7 @@
 }
 
 .glass-input { 
-    /* تغییر: کاهش پدینگ عمودی از 5 به 3 */
+    
     @apply w-full bg-transparent px-5 py-3 outline-none text-sm text-right; 
     color: #e8ecff;
 }
@@ -90,7 +90,7 @@
 }
 
 .form-map-preview {
-    /* تغییر: کاهش ارتفاع نقشه از h-80 به h-44 (بسیار مهم) */
+   
     @apply h-44 relative cursor-pointer overflow-visible rounded-[1.2rem];
     background: linear-gradient(
         135deg,
@@ -159,7 +159,7 @@
 }
 
 .status-container {
-    /* تغییر: کاهش پدینگ عمودی از 5 به 2 */
+   
     @apply px-6 py-2 flex justify-between items-center rounded-[1.2rem];
     background: linear-gradient(
         135deg,
@@ -238,11 +238,10 @@
     color: #39ff88;
 }
 
-/* تغییر: کاهش فاصله از بالا از 12 به 6 */
 .action-group { @apply flex justify-center gap-8 mt-6 w-full; }
 
 .action-circle {
-    /* تغییر: کوچک کردن دکمه‌ها از w-16 به w-12 */
+    
     @apply w-12 h-12 rounded-full flex items-center justify-center text-xl transition-all duration-300;
     background: linear-gradient(
         135deg,

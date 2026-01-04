@@ -135,7 +135,7 @@ function ItemEntryView() {
       
       <div className="fixed top-6 right-8 z-50">
         <img 
-          src="../public/logo1.png" 
+          src="../public/logo.png" 
           alt="Logo" 
           className="h-16 w-auto object-contain"
           onError={(e) => {
