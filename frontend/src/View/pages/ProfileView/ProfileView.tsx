@@ -10,8 +10,7 @@ interface Item {
   description: string;
   status: string;
   photoName: string;
-  photoData?: string; // Base64 عکس
-  date: string;
+  photoData?: string;
   timestamp: string;
 }
 
@@ -27,29 +26,66 @@ function ProfileView() {
   }, []);
 
   const fetchItems = async () => {
-    try {
-      const response = await fetch('http://localhost:3001/lostAndFoundItems');
-      const data = await response.json();
-      setItems(data);
-    } catch (error) {
-      console.error('خطا در دریافت داده‌ها:', error);
+    /* // === BACKEND API LOGIC ===
+    // Method: GET 
+    // URL: http://localhost:3001/lostAndFoundItems
+    */
+    
+    let data = JSON.parse(localStorage.getItem('lostItems') || '[]');
+    
+    
+    if (data.length === 0) {
+      data = [
+        {
+          id: 101,
+          itemName: "گوشی آیفون ۱۳",
+          tag: "اپل - مشکی",
+          category: "electronics",
+          description: "در طبقه دوم کتابخانه جا مانده است. قاب سیلیکونی آبی دارد.",
+          status: "پیدا شده", 
+          photoName: "iphone.jpg",
+          photoData: "",
+          timestamp: new Date().toISOString()
+        },
+        {
+          id: 102,
+          itemName: "کارت دانشجویی",
+          tag: "نام: علی رضایی",
+          category: "documents",
+          description: "کارت دانشجویی ورودی ۹۹ رشته کامپیوتر در سلف پیدا شده.",
+          status: "پیدا شده",
+          photoName: "card.jpg",
+          photoData: "",
+          timestamp: new Date().toISOString()
+        },
+        {
+          id: 103,
+          itemName: "دسته کلید",
+          tag: "۳ کلید با جاکلیدی خرسی",
+          category: "keys",
+          description: "یک دسته کلید در محوطه پارکینگ شماره ۳ گم شده است.",
+          status: "گم شده",
+          photoName: "keys.jpg",
+          photoData: "",
+          timestamp: new Date().toISOString()
+        }
+      ];
+      localStorage.setItem('lostItems', JSON.stringify(data));
     }
+    
+    setItems(data);
   };
 
   const handleDelete = async (id: number) => {
-    try {
-      const response = await fetch(`http://localhost:3001/lostAndFoundItems/${id}`, {
-        method: 'DELETE'
-      });
-
-      if (response.ok) {
-        await fetchItems();
-        setShowDeleteConfirm(false);
-        setItemToDelete(null);
-      }
-    } catch (error) {
-      console.error('خطا در حذف:', error);
-    }
+    /* // === BACKEND API LOGIC ===
+    // Method: DELETE
+    // URL: http://localhost:3001/lostAndFoundItems/${id}
+    */
+    const existing = JSON.parse(localStorage.getItem('lostItems') || '[]');
+    const filtered = existing.filter((i: Item) => i.id !== id);
+    localStorage.setItem('lostItems', JSON.stringify(filtered));
+    setItems(filtered);
+    setShowDeleteConfirm(false);
   };
 
   const handleEdit = (item: Item) => {
@@ -68,19 +104,15 @@ function ProfileView() {
 
   return (
     <div className="profile-container">
-      {/* لوگو */}
       <div className="fixed top-6 right-8 z-50">
         <img 
           src="/logo.png" 
           alt="Logo" 
           className="h-16 w-auto object-contain"
-          onError={(e) => {
-            e.currentTarget.style.display = 'none';
-          }}
+          onError={(e) => e.currentTarget.style.display = 'none'}
         />
       </div>
 
-      {/* هدر پروفایل - بالا سمت راست */}
       <div className="profile-header-right">
         <h2 className="profile-title">نام کاربری</h2>
         <div className="profile-avatar">
@@ -90,69 +122,42 @@ function ProfileView() {
         </div>
       </div>
 
-      {/* گرید آیتم‌ها */}
       <div className="items-grid">
         {items.map((item) => (
           <div key={item.id} className="item-card">
-            {/* بج دسته‌بندی */}
-            <div className={`category-badge category-${item.category}`}>
-              {item.category === 'electronics' && 'الکترونیک'}
-              {item.category === 'documents' && 'مدارک'}
-              {item.category === 'wallets' && 'کیف پول'}
-              {item.category === 'clothing' && 'لباس'}
-              {item.category === 'accessories' && 'لوازم جانبی'}
-              {item.category === 'keys' && 'کلید'}
-              {item.category === 'books' && 'کتاب'}
-              {item.category === 'other' && 'سایر'}
+           
+            <div className="flex justify-start mb-3">
+              <div className={`category-badge category-${item.category}`}>
+                {item.category === 'electronics' ? 'الکترونیک' : 
+                 item.category === 'documents' ? 'مدارک' : 
+                 item.category === 'keys' ? 'کلید' : 'سایر'}
+              </div>
             </div>
 
-            {/* منوی سه نقطه */}
             <div className="card-menu">
-              <button 
-                className="menu-button"
-                onClick={() => toggleMenu(item.id)}
-              >
-                ⋯
-              </button>
-              
+              <button className="menu-button" onClick={() => toggleMenu(item.id)}>⋯</button>
               {activeMenu === item.id && (
                 <div className="menu-dropdown">
-                  <button 
-                    className="menu-item edit"
-                    onClick={() => handleEdit(item)}
-                  >
-                    <span>✏️</span>
-                    ویرایش آیتم
+                  <button className="menu-item edit" onClick={() => handleEdit(item)}>
+                    <span>✏️</span> ویرایش
                   </button>
-                  <button 
-                    className="menu-item delete"
-                    onClick={() => confirmDelete(item.id)}
-                  >
-                    <span>🗑️</span>
-                    حذف آیتم
+                  <button className="menu-item delete" onClick={() => confirmDelete(item.id)}>
+                    <span>🗑️</span> حذف
                   </button>
                 </div>
               )}
             </div>
 
-            {/* عکس */}
             <div className="card-image-wrapper">
               <div className="card-image">
                 {item.photoData ? (
-                  <img 
-                    src={item.photoData} 
-                    alt={item.itemName}
-                    className="card-photo"
-                  />
+                  <img src={item.photoData} alt={item.itemName} className="card-photo" />
                 ) : (
-                  <svg className="placeholder-icon" fill="currentColor" viewBox="0 0 24 24">
-                    <path d="M21 19V5c0-1.1-.9-2-2-2H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2zM8.5 13.5l2.5 3.01L14.5 12l4.5 6H5l3.5-4.5z"/>
-                  </svg>
+                  <div className="placeholder-icon">🖼️</div>
                 )}
               </div>
             </div>
 
-            {/* محتوا */}
             <div className="card-content">
               <div className="card-header">
                 <h3 className="card-title">{item.itemName}</h3>
@@ -164,25 +169,14 @@ function ProfileView() {
         ))}
       </div>
 
-      {/* پاپ‌آپ تایید حذف */}
       {showDeleteConfirm && (
         <div className="delete-modal-overlay" onClick={() => setShowDeleteConfirm(false)}>
           <div className="delete-modal" onClick={(e) => e.stopPropagation()}>
             <h3 className="modal-title">حذف آیتم</h3>
-            <p className="modal-text">آیا مطمئن هستید که می‌خواهید این آیتم را حذف کنید؟</p>
+            <p className="modal-text">آیا از حذف این مورد اطمینان دارید؟</p>
             <div className="modal-actions">
-              <button 
-                className="modal-btn cancel"
-                onClick={() => setShowDeleteConfirm(false)}
-              >
-                انصراف
-              </button>
-              <button 
-                className="modal-btn confirm"
-                onClick={() => itemToDelete && handleDelete(itemToDelete)}
-              >
-                حذف
-              </button>
+              <button className="modal-btn cancel" onClick={() => setShowDeleteConfirm(false)}>انصراف</button>
+              <button className="modal-btn confirm" onClick={() => itemToDelete && handleDelete(itemToDelete)}>حذف</button>
             </div>
           </div>
         </div>
