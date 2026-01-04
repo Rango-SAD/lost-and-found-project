@@ -41,12 +41,6 @@ function EditView() {
       photoName: newPhoto ? newPhoto.name : itemToEdit.photoName,
     };
 
-    /*
-    // === BACKEND API LOGIC ===
-    // Method: PUT
-    // URL: http://localhost:3001/lostAndFoundItems/${itemToEdit.id}
-    // Body: JSON.stringify(updatedData)
-    */
     const existing = JSON.parse(localStorage.getItem('lostItems') || '[]');
     const updated = existing.map((i: any) => i.id === itemToEdit.id ? updatedData : i);
     localStorage.setItem('lostItems', JSON.stringify(updated));
@@ -59,7 +53,10 @@ function EditView() {
   if (!itemToEdit) return null;
 
   return (
-    <div className="entry-page-container">
+    <div 
+      className="entry-page-container min-h-screen flex items-center justify-center bg-[linear-gradient(45deg,rgba(18,24,43,0.5)_0%,rgba(16,21,39,0.77)_0%,rgba(15,19,36,1)_63%,rgba(14,18,34,0.77)_100%,rgba(11,15,26,0)_100%)]"
+      style={{ backgroundAttachment: 'fixed' }}
+    >
       <div className="fixed top-6 left-1/2 -translate-x-1/2 z-50">
         <h2 className="text-xl font-bold" style={{ color: '#e8ecff' }}>ویرایش آیتم</h2>
       </div>

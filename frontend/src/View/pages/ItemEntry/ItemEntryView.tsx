@@ -49,21 +49,6 @@ function ItemEntryView() {
       timestamp: new Date().toISOString()
     };
 
-    /* // === BACKEND API LOGIC ===
-    // Method: POST
-    // URL: http://localhost:3001/lostAndFoundItems
-    // Body: JSON.stringify(itemData)
-    try {
-      const response = await fetch('http://localhost:3001/lostAndFoundItems', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(itemData)
-      });
-      if (!response.ok) throw new Error('Error saving data');
-      // ... rest of the logic
-    } catch (e) { console.error(e); }
-    */
-
     const existing = JSON.parse(localStorage.getItem('lostItems') || '[]');
     localStorage.setItem('lostItems', JSON.stringify([...existing, itemData]));
 
@@ -81,7 +66,10 @@ function ItemEntryView() {
   };
 
   return (
-    <div className="entry-page-container">
+    <div 
+      className="entry-page-container min-h-screen flex items-center justify-center bg-[linear-gradient(45deg,rgba(18,24,43,0.5)_0%,rgba(16,21,39,0.77)_0%,rgba(15,19,36,1)_63%,rgba(14,18,34,0.77)_100%,rgba(11,15,26,0)_100%)]"
+      style={{ backgroundAttachment: 'fixed' }}
+    >
       <div className="fixed top-6 right-8 z-50">
         <img src="/logo.png" alt="Logo" className="h-16 w-auto object-contain" onError={(e) => e.currentTarget.style.display = 'none'} />
       </div>

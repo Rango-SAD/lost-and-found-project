@@ -26,13 +26,7 @@ function ProfileView() {
   }, []);
 
   const fetchItems = async () => {
-    /* // === BACKEND API LOGIC ===
-    // Method: GET 
-    // URL: http://localhost:3001/lostAndFoundItems
-    */
-    
     let data = JSON.parse(localStorage.getItem('lostItems') || '[]');
-    
     
     if (data.length === 0) {
       data = [
@@ -77,10 +71,6 @@ function ProfileView() {
   };
 
   const handleDelete = async (id: number) => {
-    /* // === BACKEND API LOGIC ===
-    // Method: DELETE
-    // URL: http://localhost:3001/lostAndFoundItems/${id}
-    */
     const existing = JSON.parse(localStorage.getItem('lostItems') || '[]');
     const filtered = existing.filter((i: Item) => i.id !== id);
     localStorage.setItem('lostItems', JSON.stringify(filtered));
@@ -103,7 +93,10 @@ function ProfileView() {
   };
 
   return (
-    <div className="profile-container">
+    <div 
+      className="profile-container min-h-screen bg-[linear-gradient(45deg,rgba(18,24,43,0.5)_0%,rgba(16,21,39,0.77)_0%,rgba(15,19,36,1)_63%,rgba(14,18,34,0.77)_100%,rgba(11,15,26,0)_100%)]"
+      style={{ backgroundAttachment: 'fixed' }}
+    >
       <div className="fixed top-6 right-8 z-50">
         <img 
           src="/logo.png" 
@@ -113,19 +106,12 @@ function ProfileView() {
         />
       </div>
 
-      <div className="profile-header-right">
-        <h2 className="profile-title">نام کاربری</h2>
-        <div className="profile-avatar">
-          <svg className="w-12 h-12" fill="currentColor" viewBox="0 0 24 24">
-            <path d="M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm0 2c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z"/>
-          </svg>
-        </div>
-      </div>
+  
 
-      <div className="items-grid">
+      <div className="items-grid pt-24"> 
         {items.map((item) => (
           <div key={item.id} className="item-card">
-           
+            
             <div className="flex justify-start mb-3">
               <div className={`category-badge category-${item.category}`}>
                 {item.category === 'electronics' ? 'الکترونیک' : 

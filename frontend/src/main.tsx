@@ -8,13 +8,10 @@ import ProfileView from './View/pages/ProfileView/ProfileView'
 import EditView from './View/pages/EditView/EditView'
 import { Header } from './View/components/Header/Header'
 
-// Wrapper component to access useNavigate
 function AppContent() {
   const navigate = useNavigate();
 
   const handleExit = () => {
-    // می‌تونی اینجا لاجیک خروج رو بنویسی
-    // مثلاً navigate به صفحه لاگین یا پاک کردن توکن
     console.log("خروج از سیستم");
     navigate('/');
   };

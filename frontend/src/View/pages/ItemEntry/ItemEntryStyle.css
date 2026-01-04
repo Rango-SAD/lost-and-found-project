@@ -1,13 +1,12 @@
 @import "tailwindcss";
 
 .entry-page-container {
-    @apply min-h-screen w-full flex flex-col items-center justify-start p-6 pt-24 pb-44;
-    background: linear-gradient(135deg, #0b0f1a, #12182b, #0f1324) !important;
+    @apply min-h-screen w-full flex flex-col items-center justify-start p-4 pt-32 pb-20;
 }
 
-.main-grid { @apply w-full max-w-6xl grid grid-cols-1 lg:grid-cols-12 gap-8 items-start; }
-.form-column { @apply lg:col-span-7 space-y-5; }
-.media-column { @apply lg:col-span-5 space-y-6; }
+.main-grid { @apply w-full max-w-6xl grid grid-cols-1 lg:grid-cols-12 gap-4 items-start; }
+.form-column { @apply lg:col-span-7 space-y-3; }
+.media-column { @apply lg:col-span-5 space-y-3; }
 
 .neon-input-card {
     @apply rounded-[2rem] overflow-visible transition-all duration-300;
@@ -23,23 +22,6 @@
         inset 0 1px 0 rgba(255, 255, 255, 0.2),
         inset 0 -1px 0 rgba(0, 0, 0, 0.1);
     position: relative;
-}
-
-.neon-input-card::after {
-    content: '';
-    position: absolute;
-    inset: -2px;
-    border-radius: 2rem;
-    padding: 2px;
-    background: 
-        linear-gradient(90deg, rgba(255, 255, 255, 0.15) 0%, rgba(255, 255, 255, 1) 50%, rgba(255, 255, 255, 0.15) 100%),
-        linear-gradient(0deg, rgba(255, 255, 255, 0.15) 0%, rgba(255, 255, 255, 1) 50%, rgba(255, 255, 255, 0.15) 100%);
-    background-blend-mode: lighten;
-    -webkit-mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
-    -webkit-mask-composite: xor;
-    mask-composite: exclude;
-    pointer-events: none;
-    filter: drop-shadow(0 0 15px rgba(255, 255, 255, 0.4));
 }
 
 .neon-input-card::before {
@@ -59,22 +41,8 @@
     z-index: 1;
 }
 
-.neon-input-card:focus-within::after {
-    background: linear-gradient(
-        45deg,
-        rgba(255, 255, 255, 0.5) 0%,
-        rgba(255, 255, 255, 1) 15%,
-        rgba(255, 255, 255, 0.6) 30%,
-        rgba(255, 255, 255, 1) 50%,
-        rgba(255, 255, 255, 0.6) 70%,
-        rgba(255, 255, 255, 1) 85%,
-        rgba(255, 255, 255, 0.5) 100%
-    );
-    filter: drop-shadow(0 0 25px rgba(255, 255, 255, 0.6));
-}
-
 .glass-input { 
-    @apply w-full bg-transparent px-8 py-5 outline-none text-sm text-right; 
+    @apply w-full bg-transparent px-6 py-3 outline-none text-sm text-right; 
     color: #e8ecff;
 }
 
@@ -83,7 +51,7 @@
 }
 
 .form-map-preview {
-    @apply h-80 relative cursor-pointer overflow-visible rounded-[2rem];
+    @apply h-52 relative cursor-pointer overflow-visible rounded-[2rem];
     background: linear-gradient(
         135deg,
         rgba(255, 255, 255, 0.05) 0%,
@@ -96,23 +64,6 @@
         inset 0 1px 0 rgba(255, 255, 255, 0.2),
         inset 0 -1px 0 rgba(0, 0, 0, 0.1);
     position: relative;
-}
-
-.form-map-preview::after {
-    content: '';
-    position: absolute;
-    inset: -2px;
-    border-radius: 2rem;
-    padding: 2px;
-    background: 
-        linear-gradient(90deg, rgba(255, 255, 255, 0.15) 0%, rgba(255, 255, 255, 1) 50%, rgba(255, 255, 255, 0.15) 100%),
-        linear-gradient(0deg, rgba(255, 255, 255, 0.15) 0%, rgba(255, 255, 255, 1) 50%, rgba(255, 255, 255, 0.15) 100%);
-    background-blend-mode: lighten;
-    -webkit-mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
-    -webkit-mask-composite: xor;
-    mask-composite: exclude;
-    pointer-events: none;
-    filter: drop-shadow(0 0 20px rgba(255, 255, 255, 0.4));
 }
 
 .form-map-preview::before {
@@ -132,17 +83,9 @@
     z-index: 1;
 }
 
-.form-map-preview:hover::after {
-    background: 
-        linear-gradient(90deg, rgba(255, 255, 255, 0.2) 0%, rgba(255, 255, 255, 1) 50%, rgba(255, 255, 255, 0.2) 100%),
-        linear-gradient(0deg, rgba(255, 255, 255, 0.2) 0%, rgba(255, 255, 255, 1) 50%, rgba(255, 255, 255, 0.2) 100%);
-    background-blend-mode: lighten;
-    filter: drop-shadow(0 0 35px rgba(255, 255, 255, 0.6));
-}
-
 .dropdown-arrow {
     position: absolute;
-    left: 2rem;
+    left: 1.5rem;
     top: 50%;
     transform: translateY(-50%);
     pointer-events: none;
@@ -151,7 +94,7 @@
 }
 
 .status-container {
-    @apply px-8 py-5 flex justify-between items-center rounded-[2rem];
+    @apply px-6 py-3 flex justify-between items-center rounded-[2rem];
     background: linear-gradient(
         135deg,
         rgba(255, 255, 255, 0.08) 0%,
@@ -165,23 +108,6 @@
         inset 0 -1px 0 rgba(0, 0, 0, 0.1);
     position: relative;
     overflow: visible;
-}
-
-.status-container::after {
-    content: '';
-    position: absolute;
-    inset: -2px;
-    border-radius: 2rem;
-    padding: 2px;
-    background: 
-        linear-gradient(90deg, rgba(255, 255, 255, 0.15) 0%, rgba(255, 255, 255, 1) 50%, rgba(255, 255, 255, 0.15) 100%),
-        linear-gradient(0deg, rgba(255, 255, 255, 0.15) 0%, rgba(255, 255, 255, 1) 50%, rgba(255, 255, 255, 0.15) 100%);
-    background-blend-mode: lighten;
-    -webkit-mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
-    -webkit-mask-composite: xor;
-    mask-composite: exclude;
-    pointer-events: none;
-    filter: drop-shadow(0 0 15px rgba(255, 255, 255, 0.4));
 }
 
 .status-container::before {
@@ -221,17 +147,13 @@
     @apply text-sm font-medium transition-all duration-300;
 }
 
-.status-text.lost {
-    color: #ff5c5c;
-}
+.status-text.lost { color: #ff5c5c; }
+.status-text.found { color: #39ff88; }
 
-.status-text.found {
-    color: #39ff88;
-}
+.action-group { @apply flex justify-center gap-8 mt-6 w-full; }
 
-.action-group { @apply flex justify-center gap-12 mt-12 w-full; }
 .action-circle {
-    @apply w-16 h-16 rounded-full flex items-center justify-center text-2xl transition-all duration-300;
+    @apply w-14 h-14 rounded-full flex items-center justify-center text-xl transition-all duration-300;
     background: linear-gradient(
         135deg,
         rgba(255, 255, 255, 0.08) 0%,
@@ -261,60 +183,8 @@
     z-index: 1;
 }
 
-.btn-check::after {
-    content: '';
-    position: absolute;
-    inset: -2px;
-    border-radius: 50%;
-    padding: 2px;
-    background: 
-        linear-gradient(90deg, rgba(34, 197, 94, 0.15) 0%, rgba(34, 197, 94, 1) 50%, rgba(34, 197, 94, 0.15) 100%),
-        linear-gradient(0deg, rgba(34, 197, 94, 0.15) 0%, rgba(34, 197, 94, 1) 50%, rgba(34, 197, 94, 0.15) 100%);
-    background-blend-mode: lighten;
-    -webkit-mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
-    -webkit-mask-composite: xor;
-    mask-composite: exclude;
-    pointer-events: none;
-    filter: drop-shadow(0 0 20px rgba(34, 197, 94, 0.5));
-}
-
-.btn-cross::after {
-    content: '';
-    position: absolute;
-    inset: -2px;
-    border-radius: 50%;
-    padding: 2px;
-    background: 
-        linear-gradient(90deg, rgba(239, 68, 68, 0.15) 0%, rgba(239, 68, 68, 1) 50%, rgba(239, 68, 68, 0.15) 100%),
-        linear-gradient(0deg, rgba(239, 68, 68, 0.15) 0%, rgba(239, 68, 68, 1) 50%, rgba(239, 68, 68, 0.15) 100%);
-    background-blend-mode: lighten;
-    -webkit-mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
-    -webkit-mask-composite: xor;
-    mask-composite: exclude;
-    pointer-events: none;
-    filter: drop-shadow(0 0 20px rgba(239, 68, 68, 0.5));
-}
-
-.btn-check { 
-    @apply text-green-400; 
-}
-.btn-cross { 
-    @apply text-red-400; 
-}
-
-.btn-check:hover::after { 
-    filter: drop-shadow(0 0 35px rgba(34, 197, 94, 0.7));
-}
-.btn-cross:hover::after { 
-    filter: drop-shadow(0 0 35px rgba(239, 68, 68, 0.7));
-}
-
-.btn-check:hover { 
-    @apply text-green-300; 
-}
-.btn-cross:hover { 
-    @apply text-red-300; 
-}
+.btn-check { @apply text-green-400; }
+.btn-cross { @apply text-red-400; }
 
 .error-popup {
     position: fixed;
@@ -322,7 +192,7 @@
     left: 50%;
     transform: translateX(-50%);
     z-index: 9999;
-    padding: 1rem 2rem;
+    padding: 0.75rem 1.5rem;
     border-radius: 1rem;
     background: linear-gradient(
         135deg,
@@ -332,11 +202,10 @@
     backdrop-filter: blur(20px);
     border: 2px solid rgba(239, 68, 68, 0.6);
     color: #ff5c5c;
-    font-size: 0.9rem;
+    font-size: 0.85rem;
     box-shadow: 
         0 8px 32px rgba(239, 68, 68, 0.3),
         0 0 30px rgba(239, 68, 68, 0.2);
-    animation: slideDown 0.3s ease-out;
 }
 
 .error-popup.success {
@@ -350,17 +219,6 @@
     box-shadow: 
         0 8px 32px rgba(34, 197, 94, 0.3),
         0 0 30px rgba(34, 197, 94, 0.2);
-}
-
-@keyframes slideDown {
-    from {
-        opacity: 0;
-        transform: translate(-50%, -2rem);
-    }
-    to {
-        opacity: 1;
-        transform: translate(-50%, 0);
-    }
 }
 
 .category-electronics { color: #00f5ff !important; }
