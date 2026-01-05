@@ -5,11 +5,13 @@ import App from "./App";
 import "./index.css";
 import Navbar from "./View/components/navbar/Navbar.tsx";
 import {ToastProvider} from "./View/components/ui/ToastProvider.tsx";
+import {Header} from "./View/components/header/Header.tsx";
 
 ReactDOM.createRoot(document.getElementById("root")!).render(
     <React.StrictMode>
         <BrowserRouter>
             <ToastProvider>
+                <Header/>
                 <Navbar/>
                 <App />
             </ToastProvider>
