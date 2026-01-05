@@ -61,15 +61,5 @@ public class JwtService {
     public Long extractUserId(String token) {
         return extractAllClaims(token).get("userId", Long.class);
     }
-
-    public boolean isTokenValid(String token) {
-        try {
-            Claims claims = extractAllClaims(token);
-            return !claims.getExpiration().before(new Date());
-        } catch (Exception e) {
-            log.error("Token validation failed: {}", e.getMessage());
-            return false;
-        }
-    }
 }
 

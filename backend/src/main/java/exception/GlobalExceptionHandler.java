@@ -85,7 +85,7 @@ public class GlobalExceptionHandler {
                 LocalDateTime.now(),
                 HttpStatus.BAD_REQUEST.value(),
                 HttpStatus.BAD_REQUEST.getReasonPhrase(),
-                "Validation failed: " + errors.toString(),
+                "Validation failed: " + errors,
                 request.getRequestURI()
         );
 
