@@ -1,4 +1,5 @@
 import { useForm } from "react-hook-form"
+import { useNavigate } from "react-router-dom"
 import { zodResolver } from "@hookform/resolvers/zod"
 import { GlassCard } from "../components/GlassCard"
 import { TextField } from "../components/TextField"
@@ -44,6 +45,8 @@ export function RegisterPage() {
     resolver: zodResolver(registerSchema),
   })
 
+  const navigate = useNavigate()
+
   const onSubmit = (data: RegisterSchema) => {
     console.log(data)
   }
@@ -73,7 +76,7 @@ export function RegisterPage() {
           </div>
 
           <div className="order-2 md:order-1 flex flex-col justify-center mt-16">
-            <h1 className="mb-10 text-4xl font-extrabold text-white/90">
+            <h1 className="mb-10 mr-[100px] text-4xl font-extrabold text-white/90">
               حساب خود را کامل کنید
             </h1>
 
@@ -106,6 +109,7 @@ export function RegisterPage() {
                   حساب کاربری دارید؟{" "}
                   <button
                     type="button"
+                    onClick={() => navigate("/login")}
                     className="text-white/80 underline underline-offset-4 decoration-white/40 hover:decoration-white/70 hover:text-white"
                   >
                     وارد شوید

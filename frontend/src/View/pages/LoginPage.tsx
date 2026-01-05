@@ -1,4 +1,5 @@
 import { useForm } from "react-hook-form"
+import { useNavigate } from "react-router-dom"
 import { zodResolver } from "@hookform/resolvers/zod"
 import { loginSchema, LoginSchema } from "../../Domain/Validators/loginValidator"
 import { useLoginVM } from "../handlers/useLoginVM"
@@ -46,6 +47,7 @@ export function LoginPage() {
   })
 
   const { login, loading, error } = useLoginVM()
+  const navigate = useNavigate()
 
   return (
     <div
@@ -99,6 +101,7 @@ export function LoginPage() {
                   حساب کاربری ندارید؟{" "}
                   <button
                     type="button"
+                    onClick={() => navigate("/register/code")}
                     className="text-white/80 underline underline-offset-4 decoration-white/40 hover:decoration-white/70 hover:text-white"
                   >
                     ثبت نام کنید
