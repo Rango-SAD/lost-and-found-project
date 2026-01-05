@@ -1,22 +1,37 @@
-import { useState } from "react"
+import { useState } from "react";
+import { authFacade } from "../../Infrastructure/Utility/authFacade";
 
 export function useRequestCodeVM() {
-  const [loading, setLoading] = useState(false)
-  const [error, setError] = useState<string | null>(null)
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState<string | null>(null);
 
-  const requestCode = async (_payload: { email: string }) => {
-    setLoading(true)
-    setError(null)
+  const requestCode = async (arg: { email: string }) => {
+    setLoading(true);
+    setError(null);
     try {
-      await new Promise((r) => setTimeout(r, 450))
-      return { ok: true as const }
-    } catch (e) {
-      setError(e instanceof Error ? e.message : "خطا در دریافت کد")
-      return { ok: false as const }
+      await authFacade.requestRegisterCode(arg);
+      return { ok: true as const };
+    } catch (e: any) {
+      setError(e?.message ?? "خطا در ارسال کد");
+      return { ok: false as const };
     } finally {
-      setLoading(false)
+      setLoading(false);
     }
-  }
+  };
 
-  return { requestCode, loading, error }
+  const verifyCode = async (arg: { email: string; code: string }) => {
+    setLoading(true);
+    setError(null);
+    try {
+      const res: any = await authFacade.verifyRegisterCode(arg);
+      return { ok: true as const, tempToken: res.tempToken as string };
+    } catch (e: any) {
+      setError(e?.message ?? "خطا در تایید کد");
+      return { ok: false as const, tempToken: null as string | null };
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  return { requestCode, verifyCode, loading, error };
 }

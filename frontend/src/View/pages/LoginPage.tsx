@@ -82,8 +82,8 @@ export function LoginPage() {
               <TextField
                 placeholder="نام کاربری"
                 endIcon={<UserIcon />}
-                {...register("email")}
-                error={formState.errors.email?.message}
+                {...register("username")}
+                error={formState.errors.username?.message}
               />
 
               <TextField
