@@ -185,6 +185,7 @@ export function RequestCodePage() {
               <PrimaryButton
                 type="submit"
                 className="w-[140px] py-4 text-sm bg-white/8 hover:bg-white/12"
+                onClick={() => navigate("/register")}
               >
                 تایید
               </PrimaryButton>

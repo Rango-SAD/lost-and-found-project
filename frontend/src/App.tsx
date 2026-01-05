@@ -8,6 +8,7 @@ import ProfileView from './View/pages/ProfileView/ProfileView'
 import EditView from './View/pages/EditView/EditView'
 import Navbar from './View/components/navbar/Navbar'
 import { Header } from './View/components/Header/Header'
+import {PostsPage} from "./View/pages/PostsPage.tsx";
 
 export default function App() {
   const location = useLocation();
@@ -43,6 +44,7 @@ export default function App() {
         <Route path="/profile" element={<ProfileView />} />
         <Route path="/edit" element={<EditView />} />
 
+        <Route path="/posts" element={<PostsPage/>} />
         <Route path="*" element={<Navigate to="/login" replace />} />
       </Routes>
     </>
