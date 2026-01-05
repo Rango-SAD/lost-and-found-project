@@ -12,7 +12,7 @@ import org.springframework.data.jpa.repository.config.EnableJpaRepositories;
 @SpringBootApplication
 @EnableCaching
 @EnableJpaAuditing
-@ComponentScan(basePackages = {"service**","service*", "config", "controller"})
+@ComponentScan(basePackages = {"service**","service*", "config", "controller", "exception"})
 @EnableJpaRepositories(basePackages = {"service.repository"})
 @EntityScan(basePackages = {"service.entity"})
 @Slf4j
