@@ -3,6 +3,7 @@ package service;
 import controller.dto.LoginRequest;
 import controller.dto.RegisterRequest;
 import exception.InvalidCredentialsException;
+import exception.InvalidOtpException;
 import exception.UserAlreadyExistsException;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -20,10 +21,18 @@ public class UserService {
     private final UserRepository userRepository;
     private final PasswordEncoder passwordEncoder;
     private final JwtService jwtService;
+    private final OtpService otpService;
 
     @Transactional
     public String register(RegisterRequest request) {
         log.info("Registering new user username={}, email={}", request.getUsername(), request.getEmail());
+
+        // Verify OTP first
+        boolean isOtpValid = otpService.verifyOtp(request.getEmail(), request.getOtp());
+        if (!isOtpValid) {
+            log.warn("Invalid or expired OTP for email={}", request.getEmail());
+            throw new InvalidOtpException("Invalid or expired OTP. Please request a new OTP.");
+        }
 
         if (userRepository.existsByEmail(request.getEmail())) {
             throw new UserAlreadyExistsException("User with this email already exists");
