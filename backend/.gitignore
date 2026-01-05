@@ -1,0 +1,44 @@
+# Compiled class files
+application-local.properties
+# Application
+
+Thumbs.db
+.DS_Store
+# OS
+
+.settings/
+.project
+.classpath
+.vscode/
+*.ipr
+*.iml
+*.iws
+.idea/
+# IDE
+
+.mvn/wrapper/maven-wrapper.jar
+.mvn/timing.properties
+buildNumber.properties
+dependency-reduced-pom.xml
+release.properties
+pom.xml.next
+pom.xml.versionsBackup
+pom.xml.releaseBackup
+pom.xml.tag
+target/
+# Maven
+
+*.rar
+*.tar.gz
+*.zip
+*.ear
+*.nar
+*.war
+*.jar
+# Package Files
+
+*.log
+# Log files
+
+*.class
+
