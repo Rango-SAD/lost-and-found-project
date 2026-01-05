@@ -14,7 +14,7 @@ import org.springframework.web.bind.annotation.*;
 import service.UserService;
 
 @RestController
-@RequestMapping("/api/")
+@RequestMapping("/api")
 @RequiredArgsConstructor
 @Slf4j
 public class UserController {
@@ -38,7 +38,7 @@ public class UserController {
         return ResponseEntity.ok().build();
     }
 
-    @PostMapping("/login")
+    @PostMapping("public/login")
     public ResponseEntity<Void> login(
             @Valid @RequestBody LoginRequest request,
             HttpServletResponse response) {
@@ -51,7 +51,7 @@ public class UserController {
         return ResponseEntity.ok().build();
     }
 
-    @PostMapping("/logout")
+    @PostMapping("public/logout")
     public ResponseEntity<String> logout(HttpServletResponse response) {
         log.info("Logout request received");
 
