@@ -1,0 +1,16 @@
+package service.entity;
+
+public enum ItemTag {
+    URGENT,
+    REWARD_OFFERED,
+    SENTIMENTAL_VALUE,
+    HIGH_VALUE,
+    PERISHABLE,
+    FRAGILE,
+    IDENTITY_RELATED,
+    MEDICAL,
+    CHILD_RELATED,
+    ELECTRONICS_TAG,
+    VEHICLE_RELATED
+}
+
