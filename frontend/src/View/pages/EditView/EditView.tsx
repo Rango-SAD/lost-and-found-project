@@ -43,7 +43,6 @@ function EditView() {
   };
 
   const handleSubmit = async () => {
-    // چک کردن فیلدها
     if (!itemName.trim()) {
       setErrorMessage("لطفاً نام آیتم را وارد کنید");
       setShowError(true);
