@@ -1,11 +1,14 @@
+import { useEffect, useState } from "react"
 import { useForm } from "react-hook-form"
 import { useNavigate } from "react-router-dom"
 import { zodResolver } from "@hookform/resolvers/zod"
+
 import { GlassCard } from "../components/GlassCard"
 import { TextField } from "../components/TextField"
 import { PrimaryButton } from "../components/PrimaryButton"
 import logo from "../assets/logo.png"
 import { registerSchema, RegisterSchema } from "../../Domain/Validators/registerValidator"
+import { authFacade } from "../../Infrastructure/Utility/authFacade"
 
 function UserIcon() {
   return (
@@ -46,9 +49,40 @@ export function RegisterPage() {
   })
 
   const navigate = useNavigate()
+  const [submitting, setSubmitting] = useState(false)
+  const [submitError, setSubmitError] = useState<string | null>(null)
 
-  const onSubmit = (data: RegisterSchema) => {
-    console.log(data)
+  useEffect(() => {
+    const temp = sessionStorage.getItem("registerTempToken")
+    if (!temp) navigate("/register/code")
+  }, [navigate])
+
+  const onSubmit = async (data: RegisterSchema) => {
+    setSubmitting(true)
+    setSubmitError(null)
+
+    try {
+      const tempToken = sessionStorage.getItem("registerTempToken")
+      if (!tempToken) {
+        navigate("/register/code")
+        return
+      }
+
+      await authFacade.register({
+        tempToken,
+        username: data.username,
+        password: data.password,
+      })
+
+      sessionStorage.removeItem("registerTempToken")
+      sessionStorage.removeItem("registerEmail")
+
+      navigate("/posts") // مسیر بعد از ثبت نام
+    } catch (e: any) {
+      setSubmitError(e?.message ?? "خطا در ثبت نام")
+    } finally {
+      setSubmitting(false)
+    }
   }
 
   return (
@@ -66,12 +100,8 @@ export function RegisterPage() {
             />
 
             <div className="-mt-20 flex flex-col items-center text-center">
-              <p className="text-3xl font-extrabold text-white/90">
-                گمشده‌ها تنها نمی‌مانند؛
-              </p>
-              <p className="mt-4 text-[22px] font-medium text-white/65">
-                اینجا دوباره پیدا می‌شوند.
-              </p>
+              <p className="text-3xl font-extrabold text-white/90">گمشده‌ها تنها نمی‌مانند؛</p>
+              <p className="mt-4 text-[22px] font-medium text-white/65">اینجا دوباره پیدا می‌شوند.</p>
             </div>
           </div>
 
@@ -104,6 +134,8 @@ export function RegisterPage() {
                 error={formState.errors.confirmPassword?.message}
               />
 
+              {submitError ? <p className="text-sm text-red-300">{submitError}</p> : null}
+
               <div className="pt-4 flex items-center gap-6">
                 <div className="text-sm text-white/55 text-right">
                   حساب کاربری دارید؟{" "}
@@ -118,9 +150,10 @@ export function RegisterPage() {
 
                 <PrimaryButton
                   type="submit"
+                  disabled={submitting}
                   className="mr-auto w-[110px] py-4 text-sm bg-white/8 hover:bg-white/12"
                 >
-                  ثبت نام
+                  {submitting ? "..." : "ثبت نام"}
                 </PrimaryButton>
               </div>
             </form>

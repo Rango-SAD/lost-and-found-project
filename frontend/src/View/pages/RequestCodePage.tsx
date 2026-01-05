@@ -60,6 +60,7 @@ type CodeForm = {
 export function RequestCodePage() {
   const navigate = useNavigate()
   const [modalOpen, setModalOpen] = useState(false)
+  const [emailForOtp, setEmailForOtp] = useState("")
 
   const { register, handleSubmit, formState } = useForm<RequestCodeSchema>({
     resolver: zodResolver(requestCodeSchema),
@@ -74,19 +75,28 @@ export function RequestCodePage() {
     defaultValues: { code: "" },
   })
 
-  const { requestCode, loading, error } = useRequestCodeVM()
+  const { requestCode, verifyCode, loading, error } = useRequestCodeVM()
 
   const onSubmitEmail = async (data: RequestCodeSchema) => {
     const res = await requestCode({ email: data.email })
     if (res.ok) {
+      setEmailForOtp(data.email)
       resetCode({ code: "" })
       setModalOpen(true)
     }
   }
 
   const onSubmitCode = async (data: CodeForm) => {
-    if (!data.code || data.code.trim().length < 4) return
-    setModalOpen(false)
+    const code = data.code?.trim()
+    if (!code || code.length < 4) return
+
+    const res = await verifyCode({ email: emailForOtp, code })
+    if (res.ok && res.tempToken) {
+      sessionStorage.setItem("registerTempToken", res.tempToken)
+      sessionStorage.setItem("registerEmail", emailForOtp)
+      setModalOpen(false)
+      navigate("/register")
+    }
   }
 
   return (
@@ -161,8 +171,6 @@ export function RequestCodePage() {
           </button>
 
           <div className="flex items-center justify-center gap-3">
-            <div className="text-white/35">
-            </div>
             <div className="text-white/90 text-3xl font-extrabold text-center">
               کد ارسال شده
             </div>
@@ -184,10 +192,10 @@ export function RequestCodePage() {
             <div className="flex items-center justify-start">
               <PrimaryButton
                 type="submit"
+                disabled={loading}
                 className="w-[140px] py-4 text-sm bg-white/8 hover:bg-white/12"
-                onClick={() => navigate("/register")}
               >
-                تایید
+                {loading ? "..." : "تایید"}
               </PrimaryButton>
             </div>
           </form>
