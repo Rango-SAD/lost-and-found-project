@@ -21,61 +21,43 @@ function ProfileView() {
   const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
   const [itemToDelete, setItemToDelete] = useState<number | null>(null);
 
+  const API_URL = "http://localhost:3001/lostAndFoundItems";
+
   useEffect(() => {
     fetchItems();
   }, []);
 
   const fetchItems = async () => {
-    let data = JSON.parse(localStorage.getItem('lostItems') || '[]');
-    
-    if (data.length === 0) {
-      data = [
-        {
-          id: 101,
-          itemName: "گوشی آیفون ۱۳",
-          tag: "اپل - مشکی",
-          category: "electronics",
-          description: "در طبقه دوم کتابخانه جا مانده است. قاب سیلیکونی آبی دارد.",
-          status: "پیدا شده", 
-          photoName: "iphone.jpg",
-          photoData: "",
-          timestamp: new Date().toISOString()
-        },
-        {
-          id: 102,
-          itemName: "کارت دانشجویی",
-          tag: "نام: علی رضایی",
-          category: "documents",
-          description: "کارت دانشجویی ورودی ۹۹ رشته کامپیوتر در سلف پیدا شده.",
-          status: "پیدا شده",
-          photoName: "card.jpg",
-          photoData: "",
-          timestamp: new Date().toISOString()
-        },
-        {
-          id: 103,
-          itemName: "دسته کلید",
-          tag: "۳ کلید با جاکلیدی خرسی",
-          category: "keys",
-          description: "یک دسته کلید در محوطه پارکینگ شماره ۳ گم شده است.",
-          status: "گم شده",
-          photoName: "keys.jpg",
-          photoData: "",
-          timestamp: new Date().toISOString()
-        }
-      ];
-      localStorage.setItem('lostItems', JSON.stringify(data));
+    try {
+      const response = await fetch(API_URL);
+      if (response.ok) {
+        const data = await response.json();
+        setItems(data);
+      } else {
+        console.error("خطا در دریافت داده‌ها از سرور");
+      }
+    } catch (error) {
+      console.error("ارتباط با سرور برقرار نشد:", error);
     }
-    
-    setItems(data);
   };
 
   const handleDelete = async (id: number) => {
-    const existing = JSON.parse(localStorage.getItem('lostItems') || '[]');
-    const filtered = existing.filter((i: Item) => i.id !== id);
-    localStorage.setItem('lostItems', JSON.stringify(filtered));
-    setItems(filtered);
-    setShowDeleteConfirm(false);
+    try {
+      const response = await fetch(`${API_URL}/${id}`, {
+        method: 'DELETE',
+      });
+
+      if (response.ok) {
+
+        setItems(prevItems => prevItems.filter(item => item.id !== id));
+        setShowDeleteConfirm(false);
+        setItemToDelete(null);
+      } else {
+        alert("خطا در حذف آیتم از سرور");
+      }
+    } catch (error) {
+      console.error("خطا در عملیات حذف:", error);
+    }
   };
 
   const handleEdit = (item: Item) => {
@@ -106,53 +88,57 @@ function ProfileView() {
         />
       </div>
 
-  
-
       <div className="items-grid pt-24"> 
-        {items.map((item) => (
-          <div key={item.id} className="item-card">
-            
-            <div className="flex justify-start mb-3">
-              <div className={`category-badge category-${item.category}`}>
-                {item.category === 'electronics' ? 'الکترونیک' : 
-                 item.category === 'documents' ? 'مدارک' : 
-                 item.category === 'keys' ? 'کلید' : 'سایر'}
-              </div>
-            </div>
-
-            <div className="card-menu">
-              <button className="menu-button" onClick={() => toggleMenu(item.id)}>⋯</button>
-              {activeMenu === item.id && (
-                <div className="menu-dropdown">
-                  <button className="menu-item edit" onClick={() => handleEdit(item)}>
-                    <span>✏️</span> ویرایش
-                  </button>
-                  <button className="menu-item delete" onClick={() => confirmDelete(item.id)}>
-                    <span>🗑️</span> حذف
-                  </button>
+        {items.length > 0 ? (
+          items.map((item) => (
+            <div key={item.id} className="item-card">
+              
+              <div className="flex justify-start mb-3">
+                <div className={`category-badge category-${item.category}`}>
+                  {item.category === 'electronics' ? 'الکترونیک' : 
+                   item.category === 'documents' ? 'مدارک' : 
+                   item.category === 'keys' ? 'کلید' : 'سایر'}
                 </div>
-              )}
-            </div>
+              </div>
 
-            <div className="card-image-wrapper">
-              <div className="card-image">
-                {item.photoData ? (
-                  <img src={item.photoData} alt={item.itemName} className="card-photo" />
-                ) : (
-                  <div className="placeholder-icon">🖼️</div>
+              <div className="card-menu">
+                <button className="menu-button" onClick={() => toggleMenu(item.id)}>⋯</button>
+                {activeMenu === item.id && (
+                  <div className="menu-dropdown">
+                    <button className="menu-item edit" onClick={() => handleEdit(item)}>
+                      <span>✏️</span> ویرایش
+                    </button>
+                    <button className="menu-item delete" onClick={() => confirmDelete(item.id)}>
+                      <span>🗑️</span> حذف
+                    </button>
+                  </div>
                 )}
               </div>
-            </div>
 
-            <div className="card-content">
-              <div className="card-header">
-                <h3 className="card-title">{item.itemName}</h3>
-                <span className="card-tag">{item.tag}</span>
+              <div className="card-image-wrapper">
+                <div className="card-image">
+                  {item.photoData ? (
+                    <img src={item.photoData} alt={item.itemName} className="card-photo" />
+                  ) : (
+                    <div className="placeholder-icon">🖼️</div>
+                  )}
+                </div>
               </div>
-              <p className="card-description">{item.description}</p>
+
+              <div className="card-content">
+                <div className="card-header">
+                  <h3 className="card-title">{item.itemName}</h3>
+                  <span className="card-tag">{item.tag}</span>
+                </div>
+                <p className="card-description">{item.description}</p>
+              </div>
             </div>
+          ))
+        ) : (
+          <div className="text-white text-center w-full col-span-full py-10">
+             موردی جهت نمایش یافت نشد.
           </div>
-        ))}
+        )}
       </div>
 
       {showDeleteConfirm && (
