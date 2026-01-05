@@ -15,6 +15,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import service.JwtService;
 import service.UserService;
 
 @RestController
@@ -39,13 +40,11 @@ public class UserController {
     })
     public ResponseEntity<Void> register(
             @Valid @RequestBody RegisterRequest request,
-            HttpServletResponse response) {
-        log.info("Register request received for email: {}", request.getEmail());
-        String jwtCookie = userService.register(request);
-
-        // Set JWT cookie
-        setJwtCookie(response, jwtCookie);
-
+            HttpServletResponse response
+    ) {
+        log.info("Register request received for username: {}, email: {}", request.getUsername(), request.getEmail());
+        String token = userService.register(request);
+        setJwtCookie(response, token);
         return ResponseEntity.ok().build();
     }
 
@@ -58,13 +57,11 @@ public class UserController {
     })
     public ResponseEntity<Void> login(
             @Valid @RequestBody LoginRequest request,
-            HttpServletResponse response) {
-        log.info("Login request received for email: {}", request.getEmail());
-        String jwtCookie = userService.login(request);
-
-        // Set JWT cookie
-        setJwtCookie(response, jwtCookie);
-
+            HttpServletResponse response
+    ) {
+        log.info("Login request received for username: {}", request.getUsername());
+        String token = userService.login(request);
+        setJwtCookie(response, token);
         return ResponseEntity.ok().build();
     }
 
@@ -77,7 +74,6 @@ public class UserController {
     public ResponseEntity<String> logout(HttpServletResponse response) {
         log.info("Logout request received");
 
-        // Clear JWT cookie
         Cookie cookie = new Cookie(jwtService.getCookieName(), null);
         cookie.setHttpOnly(true);
         cookie.setSecure(cookieSecure);
@@ -93,8 +89,7 @@ public class UserController {
         cookie.setHttpOnly(true);
         cookie.setSecure(cookieSecure);
         cookie.setPath("/");
-        cookie.setMaxAge((int) (jwtService.getJwtExpiration() / 1000)); // Convert to seconds
+        cookie.setMaxAge((int) (jwtService.getJwtExpiration() / 1000));
         response.addCookie(cookie);
     }
 }
-

@@ -23,39 +23,39 @@ public class UserService {
 
     @Transactional
     public String register(RegisterRequest request) {
-        log.info("Registering new user with email: {}", request.getEmail());
+        log.info("Registering new user username={}, email={}", request.getUsername(), request.getEmail());
 
         if (userRepository.existsByEmail(request.getEmail())) {
             throw new UserAlreadyExistsException("User with this email already exists");
         }
+        if (userRepository.existsByName(request.getUsername())) {
+            throw new UserAlreadyExistsException("User with this username already exists");
+        }
 
         User user = new User();
-        user.setName(request.getName());
+        user.setName(request.getUsername()); // username -> name
         user.setEmail(request.getEmail());
         user.setPassword(passwordEncoder.encode(request.getPassword()));
 
         User savedUser = userRepository.save(user);
-        log.info("User registered successfully with id: {}", savedUser.getId());
+        log.info("User registered successfully with id={}", savedUser.getId());
 
-        return jwtService.generateToken(savedUser.getId(), savedUser.getEmail());
+        return jwtService.generateToken(savedUser.getId(), savedUser.getEmail(), savedUser.getName());
     }
 
     @Transactional(readOnly = true)
     public String login(LoginRequest request) {
-        log.info("Login attempt for email: {}", request.getEmail());
+        log.info("Login attempt username={}", request.getUsername());
 
-        User user = userRepository.findByEmail(request.getEmail())
-                .orElseThrow(() -> new InvalidCredentialsException("Invalid email or password"));
+        User user = userRepository.findByName(request.getUsername())
+                .orElseThrow(() -> new InvalidCredentialsException("Invalid username or password"));
 
         if (!passwordEncoder.matches(request.getPassword(), user.getPassword())) {
-            log.warn("Invalid password attempt for email: {}", request.getEmail());
-            throw new InvalidCredentialsException("Invalid email or password");
+            log.warn("Invalid password attempt username={}", request.getUsername());
+            throw new InvalidCredentialsException("Invalid username or password");
         }
-        log.info("User logged in successfully: {}", user.getEmail());
 
-        return jwtService.generateToken(user.getId(), user.getEmail());
-
-
+        log.info("User logged in successfully username={}, email={}", user.getName(), user.getEmail());
+        return jwtService.generateToken(user.getId(), user.getEmail(), user.getName());
     }
 }
-
