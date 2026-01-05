@@ -47,7 +47,6 @@ function setUsers(users: MockUser[]) {
   save(USERS_KEY, users);
 }
 
-// -------------------- LOGIN (همان ماک قبلی) --------------------
 export const loginApi = async (data: LoginForm): Promise<void> => {
   await sleep(800);
 
@@ -65,7 +64,6 @@ export const loginApi = async (data: LoginForm): Promise<void> => {
   localStorage.setItem("username", data.username);
 };
 
-// -------------------- REGISTER STEP 1: REQUEST OTP --------------------
 export const requestRegisterCodeApi = async (arg: { email: string }) => {
   await sleep(700);
 
@@ -96,7 +94,6 @@ export const requestRegisterCodeApi = async (arg: { email: string }) => {
   return { ok: true as const };
 };
 
-// -------------------- REGISTER STEP 2: VERIFY OTP => tempToken --------------------
 export const verifyRegisterCodeApi = async (arg: { email: string; code: string }) => {
   await sleep(700);
 
@@ -143,7 +140,6 @@ export const verifyRegisterCodeApi = async (arg: { email: string; code: string }
   return { ok: true as const, tempToken };
 };
 
-// -------------------- REGISTER STEP 3: FINISH REGISTER --------------------
 export const registerApi = async (arg: { tempToken: string; username: string; password: string }) => {
   await sleep(900);
 
