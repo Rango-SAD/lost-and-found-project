@@ -77,7 +77,7 @@ export function RegisterPage() {
       sessionStorage.removeItem("registerTempToken")
       sessionStorage.removeItem("registerEmail")
 
-      navigate("/posts") // مسیر بعد از ثبت نام
+      navigate("/posts")  
     } catch (e: any) {
       setSubmitError(e?.message ?? "خطا در ثبت نام")
     } finally {
