@@ -269,7 +269,7 @@ export function PostCard({ post, onContact, onReport, onOpen }: Props) {
                         onClick={() => {
                             setReportOpen(false);
                             onReport?.(post.id);
-                            toast.push("ریپورت شما ثبت شد.")
+                            toast.push("ریپورت شما ثبت شد")
                         }}
                     >
                         بله
@@ -338,7 +338,7 @@ export function PostCard({ post, onContact, onReport, onOpen }: Props) {
                                     onContact?.(post.id, message.trim());
                                     setContactOpen(false);
                                     setMessage("");
-                                    toast.push("پیام شما ارسال شد.");
+                                    toast.push("پیام شما ارسال شد");
                                 }}
                             >
                                 ارسال
