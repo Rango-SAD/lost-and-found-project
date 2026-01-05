@@ -1,5 +1,9 @@
 package controller;
 
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import io.swagger.v3.oas.annotations.responses.ApiResponses;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import service.JwtService;
 import controller.dto.LoginRequest;
 import controller.dto.RegisterRequest;
@@ -17,6 +21,7 @@ import service.UserService;
 @RequestMapping("/api/")
 @RequiredArgsConstructor
 @Slf4j
+@Tag(name = "User Management", description = "APIs for user registration, authentication, and logout")
 public class UserController {
 
     private final UserService userService;
@@ -26,6 +31,12 @@ public class UserController {
     private boolean cookieSecure;
 
     @PostMapping("public/register")
+    @Operation(summary = "Register a new user", description = "Creates a new user account and returns a JWT token in a cookie")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "User registered successfully"),
+            @ApiResponse(responseCode = "400", description = "Invalid input or user already exists"),
+            @ApiResponse(responseCode = "500", description = "Internal server error")
+    })
     public ResponseEntity<Void> register(
             @Valid @RequestBody RegisterRequest request,
             HttpServletResponse response) {
@@ -38,7 +49,13 @@ public class UserController {
         return ResponseEntity.ok().build();
     }
 
-    @PostMapping("/login")
+    @PostMapping("public/login")
+    @Operation(summary = "User login", description = "Authenticates a user and returns a JWT token in a cookie")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "Login successful"),
+            @ApiResponse(responseCode = "401", description = "Invalid credentials"),
+            @ApiResponse(responseCode = "500", description = "Internal server error")
+    })
     public ResponseEntity<Void> login(
             @Valid @RequestBody LoginRequest request,
             HttpServletResponse response) {
@@ -52,6 +69,11 @@ public class UserController {
     }
 
     @PostMapping("/logout")
+    @Operation(summary = "User logout", description = "Logs out the user by clearing the JWT cookie")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "Logout successful"),
+            @ApiResponse(responseCode = "500", description = "Internal server error")
+    })
     public ResponseEntity<String> logout(HttpServletResponse response) {
         log.info("Logout request received");
 

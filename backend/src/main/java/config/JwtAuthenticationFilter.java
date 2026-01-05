@@ -73,7 +73,9 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
 
     private boolean isPublicEndpoint(HttpServletRequest request) {
         String path = request.getRequestURI();
-        return path.startsWith("/api/public/");
+        return path.startsWith("/api/public/") ||
+               path.startsWith("/v3/api-docs") ||
+               path.startsWith("/swagger-ui");
     }
 
     private String extractJwtFromRequest(HttpServletRequest request) {
