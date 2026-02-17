@@ -12,3 +12,9 @@
 .idea
 .idea**
 backend/target**
+
+# Editor settings
+.vscode/
+
+# Temporary and sensitive files
+cookies.txt
