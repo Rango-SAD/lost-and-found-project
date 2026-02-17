@@ -18,3 +18,6 @@ backend/target**
 
 # Temporary and sensitive files
 cookies.txt
+
+# Python bytecode
+**/__pycache__/
