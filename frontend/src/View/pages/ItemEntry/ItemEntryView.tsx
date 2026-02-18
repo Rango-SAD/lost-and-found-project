@@ -3,6 +3,7 @@ import { useNavigate } from "react-router-dom";
 import UniversityMap from "../../components/map/UniversityMap";
 import "./ItemEntryStyle.css";
 import "../MapView/MapViewStyle.css";
+import { useLocation } from "react-router-dom";
 
 function ItemEntryView() {
   const navigate = useNavigate();
@@ -15,6 +16,15 @@ function ItemEntryView() {
   const [photoPreview, setPhotoPreview] = useState<string>("");
   const [showError, setShowError] = useState(false);
   const [errorMessage, setErrorMessage] = useState("");
+  const location = useLocation();
+  const [selectedPos, setSelectedPos] = useState<{lat: number, lng: number} | null>(null);
+
+  useEffect(() => {
+    if (location.state?.selectedLocation) {
+        setSelectedPos(location.state.selectedLocation);
+    }
+}, [location.state]);
+
 
   const toggleStatus = () => {
     setIsFound(!isFound);
@@ -74,6 +84,7 @@ function ItemEntryView() {
       status: isFound ? "پیدا شده" : "گم شده",
       photoName: photo.name,
       photoData: photoPreview, 
+      location: selectedPos,
       date: new Date().toLocaleDateString('fa-IR'),
       timestamp: new Date().toISOString()
     };
