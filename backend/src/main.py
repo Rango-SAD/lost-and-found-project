@@ -1,6 +1,6 @@
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware 
-from api.routes.lost_found import router as lost_found_router
+from api.routes import lost_found, categories
 
 app = FastAPI(title="Lost and Found University System")
 
@@ -12,7 +12,8 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
-app.include_router(lost_found_router)
+app.include_router(lost_found.router)
+app.include_router(categories.router)
 
 @app.get("/")
 def read_root():
