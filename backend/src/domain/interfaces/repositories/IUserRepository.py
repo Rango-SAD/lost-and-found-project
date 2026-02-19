@@ -4,5 +4,5 @@ from typing import Optional
 
 class IUserRepository(ABC):
     @abstractmethod
-    def get_by_username(self, username: str) -> Optional[User]:
+    async def get_by_username(self, username: str) -> Optional[User]:
         pass
