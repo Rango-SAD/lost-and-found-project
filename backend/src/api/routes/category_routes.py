@@ -1,8 +1,8 @@
 from fastapi import APIRouter
 
-from api.schemas.category_schema import CategoryResponse, CreateCategoryRequest
-from application.use_cases.create_category import CreateCategoryUseCase
-from application.use_cases.list_categories import ListCategoriesUseCase
+from src.api.schemas.category_schema import CategoryResponse, CreateCategoryRequest
+from src.application.use_cases.create_category import CreateCategoryUseCase
+from src.application.use_cases.list_categories import ListCategoriesUseCase
 
 
 router = APIRouter(prefix="/categories",tags=["Categories"],)

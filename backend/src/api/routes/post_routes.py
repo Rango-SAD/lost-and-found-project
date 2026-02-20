@@ -1,12 +1,12 @@
 from fastapi import APIRouter
 
-from api.schemas.post_schema import PostResponse, CreatePostRequest, UpdatePostRequest
-from application.use_cases.posts.create_post import CreatePostUseCase
-from application.use_cases.posts.list_posts import ListPostsUseCase
-from application.use_cases.posts.get_posts_by_publisher import GetPostsByPublisherUseCase
-from application.use_cases.posts.get_posts_by_category import GetPostsByCategoryUseCase
-from application.use_cases.posts.update_post import UpdatePostUseCase
-from application.use_cases.posts.delete_post import DeletePostUseCase
+from src.api.schemas.post_schema import PostResponse, CreatePostRequest, UpdatePostRequest
+from src.application.use_cases.create_post import CreatePostUseCase
+from src.application.use_cases.list_posts import ListPostsUseCase
+from src.application.use_cases.get_posts_by_publisher import GetPostsByPublisherUseCase
+from src.application.use_cases.get_posts_by_category import GetPostsByCategoryUseCase
+from src.application.use_cases.update_post import UpdatePostUseCase
+from src.application.use_cases.delete_post import DeletePostUseCase
 
 
 router = APIRouter(prefix="/posts", tags=["Posts"])

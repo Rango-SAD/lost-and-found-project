@@ -1,12 +1,8 @@
 from typing import List
 
 from src.domain.entities.category import Category
-from src.domain.interfaces.repositories.ICategoryRepository import (
-    ICategoryRepository,
-)
-from src.infrastructure.database.models.category_document import (
-    CategoryDocument,
-)
+from src.domain.interfaces.repositories.ICategoryRepository import ICategoryRepository
+from src.infrastructure.database.models.category_document import CategoryDocument
 
 
 class MongoCategoryRepository(ICategoryRepository):
