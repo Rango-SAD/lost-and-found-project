@@ -48,19 +48,25 @@ function setUsers(users: MockUser[]) {
 }
 
 export const loginApi = async (data: LoginForm): Promise<void> => {
-  await sleep(800);
+  const response = await fetch('http://127.0.0.1:8000/auth/login', {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+    },
+    body: JSON.stringify({
+      username: data.username,
+      password: data.password
+    })
+  });
 
-  const users = getUsers();
-  const u = data.username.trim().toLowerCase();
-  const p = data.password;
+  if (!response.ok) {
+    const errorData = await response.json();
+    throw new Error(errorData.detail || "نام کاربری یا رمز عبور اشتباه است.");
+  }
 
-  const ok = users.some(
-    (x) => x.username.toLowerCase() === u && x.password === p
-  );
+  const result = await response.json();
 
-  if (!ok) throw new Error("نام کاربری یا رمز عبور اشتباه است.");
-
-  localStorage.setItem("accessToken", "mock-token");
+  localStorage.setItem("accessToken", result.access_token);
   localStorage.setItem("username", data.username);
 };
 
