@@ -7,40 +7,51 @@ from src.application.use_cases.get_posts_by_publisher import GetPostsByPublisher
 from src.application.use_cases.get_posts_by_category import GetPostsByCategoryUseCase
 from src.application.use_cases.update_post import UpdatePostUseCase
 from src.application.use_cases.delete_post import DeletePostUseCase
+from src.infrastructure.repositories.mongo_post_repository import MongoPostRepository
+
 
 
 router = APIRouter(prefix="/posts", tags=["Posts"])
 
 @router.get("/all", response_model=list[PostResponse])
-def get_all_posts():
-    use_case = ListPostsUseCase()
-    return use_case.execute()
+async def get_all_posts():
+    post_repo = MongoPostRepository()
+    use_case = ListPostsUseCase(post_repo)
+    return await use_case.execute()
+
 
 @router.get("/publisher/{username}", response_model=list[PostResponse])
-def get_posts_by_publisher(username: str):
-    use_case = GetPostsByPublisherUseCase()
-    return use_case.execute(username)
+async def get_posts_by_publisher(username: str):
+    post_repo = MongoPostRepository()
+    use_case = GetPostsByPublisherUseCase(post_repo)
+    return await use_case.execute(username)
+
 
 @router.get("/category/{category_key}", response_model=list[PostResponse])
-def get_posts_by_category(category_key: str):
-    use_case = GetPostsByCategoryUseCase()
-    return use_case.execute(category_key)
+async def get_posts_by_category(category_key: str):
+    post_repo = MongoPostRepository()
+    use_case = GetPostsByCategoryUseCase(post_repo)
+    return await use_case.execute(category_key)
+
 
 @router.post("/add", response_model=PostResponse)
-def create_post(request: CreatePostRequest):
-    use_case = CreatePostUseCase()
-    return use_case.execute(request)
+async def create_post(request: CreatePostRequest):
+    post_repo = MongoPostRepository()
+    use_case = CreatePostUseCase(post_repo)
+    return await use_case.execute(request)
+
 
 @router.put("/{post_id}", response_model=PostResponse)
-def update_post(post_id: str, request: UpdatePostRequest):
-    use_case = UpdatePostUseCase()
-    return use_case.execute(post_id, request)
+async def update_post(post_id: str, request: UpdatePostRequest):
+    post_repo = MongoPostRepository()
+    use_case = UpdatePostUseCase(post_repo)
+    return await use_case.execute(post_id, request)
+
 
 @router.delete("/{post_id}")
-def delete_post(post_id: str):
-    use_case = DeletePostUseCase()
-    use_case.execute(post_id)
+async def delete_post(post_id: str):
+    post_repo = MongoPostRepository()
+    use_case = DeletePostUseCase(post_repo)
+    await use_case.execute(post_id)
     return {"message": "Post deleted successfully"}
-
-
 

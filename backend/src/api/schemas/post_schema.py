@@ -15,7 +15,7 @@ class PostResponse(BaseModel):
 
     type: Literal["lost", "found"]
     title: str
-    category: str
+    category_key: str
     tag: str
     description: str
     publisher_username: str
@@ -30,7 +30,7 @@ class PostResponse(BaseModel):
 class CreatePostRequest(BaseModel):
     type: Literal["lost", "found"]
     title: str
-    category: str
+    category_key: str
     tag: str
     description: str
     publisher_username: str
@@ -41,7 +41,7 @@ class CreatePostRequest(BaseModel):
 
 class UpdatePostRequest(BaseModel):
     title: Optional[str] = None
-    category: Optional[str] = None
+    category_key: Optional[str] = None
     tag: Optional[str] = None
     description: Optional[str] = None
     location: Optional[GeoLocationSchema] = None

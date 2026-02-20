@@ -1,4 +1,5 @@
 from typing import List, Optional
+from datetime import datetime
 
 from src.domain.entities.post import Post
 from src.domain.entities.geo_location import GeoLocation
@@ -24,7 +25,7 @@ class MongoPostRepository(IPostRepository):
 
     async def get_by_category(self, category_key: str) -> List[Post]:
         docs = await PostDocument.find(
-            PostDocument.category == category_key
+            PostDocument.category_key == category_key
         ).to_list()
         return [self._to_entity(doc) for doc in docs]
 
@@ -32,19 +33,17 @@ class MongoPostRepository(IPostRepository):
         doc = PostDocument(
             type=post.type,
             title=post.title,
-            category=post.category,
+            category_key=post.category_key,
             tag=post.tag,
             description=post.description,
             publisher_username=post.publisher_username,
             location={
-                "type": post.location.type,
-                "coordinates": post.location.coordinates,
-            }
-            if post.location
-            else None,
+                "type" : post.location["type"],
+                "coordinates" : post.location["coordinates"],
+            },
             image_url=post.image_url,
             reports_count=post.reports_count,
-            created_at=post.created_at,
+            created_at=datetime.now(),
         )
         await doc.insert()
         return self._to_entity(doc)
@@ -73,16 +72,14 @@ class MongoPostRepository(IPostRepository):
             id=str(doc.id),
             type=doc.type,
             title=doc.title,
-            category=doc.category,
+            category_key=doc.category_key,
             tag=doc.tag,
             description=doc.description,
             publisher_username=doc.publisher_username,
-            location=GeoLocation(
-                type=doc.location["type"],
-                coordinates=doc.location["coordinates"],
-            )
-            if doc.location
-            else None,
+            location={
+                "type": doc.location.type,
+                "coordinates": doc.location.coordinates 
+            },
             reports_count=doc.reports_count,
             image_url=doc.image_url,
             created_at=doc.created_at,

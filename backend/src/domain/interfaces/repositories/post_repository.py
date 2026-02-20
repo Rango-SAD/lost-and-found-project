@@ -32,7 +32,7 @@ class PostRepository(IPostRepository):
         doc = PostDocument(
             type=post.type,
             title=post.title,
-            category=post.category,
+            category_key=post.category_key,
             tag=post.tag,
             description=post.description,
             publisher_username=post.publisher_username,
@@ -73,13 +73,13 @@ class PostRepository(IPostRepository):
             id=str(doc.id),
             type=doc.type,
             title=doc.title,
-            category=doc.category,
+            category_key=doc.category_key,
             tag=doc.tag,
             description=doc.description,
             publisher_username=doc.publisher_username,
             location=GeoLocation(
-                type=doc.location["type"],
-                coordinates=doc.location["coordinates"],
+                type=doc.location.type,
+                coordinates=doc.location.coordinates,
             )
             if doc.location
             else None,

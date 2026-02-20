@@ -8,7 +8,7 @@ from src.infrastructure.database.models.geo_location import GeoLocation
 class PostDocument(Document):
     type: str
     title: str
-    category: str
+    category_key: str
     tag: Optional[str] = None
     description: str
 

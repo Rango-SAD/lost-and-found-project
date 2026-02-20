@@ -11,7 +11,7 @@ class Post:
 
     type: Literal["lost", "found"] = "lost"
     title: str = ""
-    category: str = ""
+    category_key: str = ""
     tag: str = ""
     description: str = ""
     publisher_username: str = ""
