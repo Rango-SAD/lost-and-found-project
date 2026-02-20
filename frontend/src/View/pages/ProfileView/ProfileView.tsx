@@ -48,7 +48,6 @@ function ProfileView() {
       });
 
       if (response.ok) {
-
         setItems(prevItems => prevItems.filter(item => item.id !== id));
         setShowDeleteConfirm(false);
         setItemToDelete(null);
@@ -75,10 +74,7 @@ function ProfileView() {
   };
 
   return (
-    <div 
-      className="profile-container min-h-screen bg-[linear-gradient(45deg,rgba(18,24,43,0.5)_0%,rgba(16,21,39,0.77)_0%,rgba(15,19,36,1)_63%,rgba(14,18,34,0.77)_100%,rgba(11,15,26,0)_100%)]"
-      style={{ backgroundAttachment: 'fixed' }}
-    >
+    <div className="profile-container min-h-screen">
       <div className="fixed top-6 right-8 z-50">
         <img 
           src="/logo.png" 
@@ -135,8 +131,8 @@ function ProfileView() {
             </div>
           ))
         ) : (
-          <div className="text-white text-center w-full col-span-full py-10">
-             موردی جهت نمایش یافت نشد.
+          <div className="text-center w-full col-span-full py-10" style={{ color: "var(--text-primary)" }}>
+            موردی جهت نمایش یافت نشد.
           </div>
         )}
       </div>

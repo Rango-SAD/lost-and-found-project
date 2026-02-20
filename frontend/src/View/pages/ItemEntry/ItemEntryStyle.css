@@ -10,17 +10,12 @@
 
 .neon-input-card {
     @apply rounded-[2rem] overflow-visible transition-all duration-300;
-    background: linear-gradient(
-        135deg,
-        rgba(255, 255, 255, 0.08) 0%,
-        rgba(255, 255, 255, 0.02) 100%
-    );
+    background: var(--surface-2);
     backdrop-filter: blur(20px);
-    border: 0 !important;
+    border: 1px solid var(--border-soft) !important;
     box-shadow: 
-        0 8px 32px rgba(0, 0, 0, 0.3),
-        inset 0 1px 0 rgba(255, 255, 255, 0.2),
-        inset 0 -1px 0 rgba(0, 0, 0, 0.1);
+        0 8px 32px var(--overlay),
+        inset 0 1px 0 rgba(255, 255, 255, 0.1);
     position: relative;
 }
 
@@ -33,7 +28,7 @@
     height: 50%;
     background: linear-gradient(
         180deg,
-        rgba(255, 255, 255, 0.1) 0%,
+        rgba(255, 255, 255, 0.05) 0%,
         transparent 100%
     );
     pointer-events: none;
@@ -42,27 +37,33 @@
 }
 
 .glass-input { 
-    @apply w-full bg-transparent px-6 py-3 outline-none text-sm text-right; 
-    color: #e8ecff;
+    @apply w-full bg-transparent px-6 py-3 outline-none text-sm;
+    color: var(--text-primary) !important;
+    direction: rtl;
+    text-align: right;
 }
 
 .glass-input::placeholder {
-    color: #6f76a8;
+    color: var(--text-muted) !important;
+    text-align: right;
+}
+
+.glass-input option {
+    background: var(--bg-base);
+    color: var(--text-primary);
+    padding: 0.5rem;
+    direction: rtl;
+    text-align: right;
 }
 
 .form-map-preview {
     @apply h-52 relative cursor-pointer overflow-visible rounded-[2rem];
-    background: linear-gradient(
-        135deg,
-        rgba(255, 255, 255, 0.05) 0%,
-        rgba(255, 255, 255, 0.02) 100%
-    );
+    background: var(--surface-2);
     backdrop-filter: blur(20px);
-    border: 0 !important;
+    border: 1px solid var(--border-soft) !important;
     box-shadow: 
-        0 8px 32px rgba(0, 0, 0, 0.3),
-        inset 0 1px 0 rgba(255, 255, 255, 0.2),
-        inset 0 -1px 0 rgba(0, 0, 0, 0.1);
+        0 8px 32px var(--overlay),
+        inset 0 1px 0 rgba(255, 255, 255, 0.1);
     position: relative;
 }
 
@@ -75,7 +76,7 @@
     height: 50%;
     background: linear-gradient(
         180deg,
-        rgba(255, 255, 255, 0.08) 0%,
+        rgba(255, 255, 255, 0.05) 0%,
         transparent 100%
     );
     pointer-events: none;
@@ -86,26 +87,22 @@
 .dropdown-arrow {
     position: absolute;
     left: 1.5rem;
+    right: auto;
     top: 50%;
     transform: translateY(-50%);
     pointer-events: none;
-    color: #6f76a8;
+    color: var(--text-muted) !important;
     font-size: 0.75rem;
 }
 
 .status-container {
     @apply px-6 py-3 flex justify-between items-center rounded-[2rem];
-    background: linear-gradient(
-        135deg,
-        rgba(255, 255, 255, 0.08) 0%,
-        rgba(255, 255, 255, 0.02) 100%
-    );
+    background: var(--surface-2);
     backdrop-filter: blur(20px);
-    border: 0 !important;
+    border: 1px solid var(--border-soft) !important;
     box-shadow: 
-        0 8px 32px rgba(0, 0, 0, 0.3),
-        inset 0 1px 0 rgba(255, 255, 255, 0.2),
-        inset 0 -1px 0 rgba(0, 0, 0, 0.1);
+        0 8px 32px var(--overlay),
+        inset 0 1px 0 rgba(255, 255, 255, 0.1);
     position: relative;
     overflow: visible;
 }
@@ -119,7 +116,7 @@
     height: 50%;
     background: linear-gradient(
         180deg,
-        rgba(255, 255, 255, 0.1) 0%,
+        rgba(255, 255, 255, 0.05) 0%,
         transparent 100%
     );
     pointer-events: none;
@@ -154,18 +151,13 @@
 
 .action-circle {
     @apply w-14 h-14 rounded-full flex items-center justify-center text-xl transition-all duration-300;
-    background: linear-gradient(
-        135deg,
-        rgba(255, 255, 255, 0.08) 0%,
-        rgba(255, 255, 255, 0.02) 100%
-    );
+    background: var(--surface-2);
     backdrop-filter: blur(20px);
     box-shadow: 
-        0 8px 32px rgba(0, 0, 0, 0.3),
-        inset 0 1px 0 rgba(255, 255, 255, 0.2),
-        inset 0 -1px 0 rgba(0, 0, 0, 0.1);
+        0 8px 32px var(--overlay),
+        inset 0 1px 0 rgba(255, 255, 255, 0.1);
+    border: 1px solid var(--border-soft) !important;
     position: relative;
-    border: 0 !important;
     overflow: visible;
 }
 
@@ -176,7 +168,7 @@
     border-radius: 50%;
     background: linear-gradient(
         180deg,
-        rgba(255, 255, 255, 0.1) 0%,
+        rgba(255, 255, 255, 0.05) 0%,
         transparent 100%
     );
     pointer-events: none;

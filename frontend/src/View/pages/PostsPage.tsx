@@ -6,20 +6,19 @@ type DbItem = {
     id: string;
     itemName: string;
     tag: string;
-    category: string;     // e.g. "electronics"
+    category: string;     
     description: string;
-    status: string;       // e.g. "گم شده" / ...
+    status: string;       
     photoName?: string;
     photoData?: string;
-    date?: string;        // e.g. "۱۴۰۴/۱۰/۱۵"
-    timestamp?: string;   // ISO
+    date?: string;        
+    timestamp?: string;   
 };
 
 const API_URL = "http://127.0.0.1:3001/lostAndFoundItems";
 
 function mapCategory(dbCategory: string): LostFoundPost["category"] {
-    // اگر LostFoundPost.category شما union/string آزاد است، همین‌ها مشکلی ندارند.
-    // اگر strict-union داری، این map را با enum خودتان sync کن.
+
     const c = (dbCategory || "").toLowerCase();
     if (c === "electronics") return "Electronics" as LostFoundPost["category"];
     if (c === "documents") return "Documents" as LostFoundPost["category"];
@@ -31,10 +30,8 @@ function mapCategory(dbCategory: string): LostFoundPost["category"] {
 
 function inferTypeFromStatus(status: string): LostFoundPost["type"] {
     const s = (status || "").trim();
-    // بسته به دیتای خودت اینجا را تنظیم کن
     if (s.includes("گم")) return "LOST";
     if (s.includes("پیدا")) return "FOUND";
-    // fallback
     return "LOST";
 }
 
@@ -49,13 +46,13 @@ function mapDbItemToPost(item: DbItem): LostFoundPost {
     return {
         id: item.id,
         type: inferTypeFromStatus(item.status),
-        status: "Open", // چون db.json شما "Open/Closed" ندارد؛ فعلاً ثابت
+        status: "Open", 
         category: mapCategory(item.category),
         itemName: item.itemName,
         tag: item.tag,
-        location: "—", // چون db.json شما location ندارد؛ فعلاً placeholder
+        location: "—", 
         description: item.description,
-        publisherName: "نام کاربری", // چون db.json شما publisher ندارد
+        publisherName: "نام کاربری", 
         publishedAt,
     };
 }
@@ -94,13 +91,7 @@ export function PostsPage() {
     const posts: LostFoundPost[] = useMemo(() => items.map(mapDbItemToPost), [items]);
 
     return (
-        <div
-            dir="rtl"
-            className="min-h-screen flex items-center justify-center bg-[linear-gradient(45deg,rgba(18,24,43,0.5)_0%,rgba(16,21,39,0.77)_0%,rgba(15,19,36,1)_63%,rgba(14,18,34,0.77)_100%,rgba(11,15,26,0)_100%)]"
-        >
-            {/* Fixed full background */}
-            <div className="fixed inset-0 -z-10 bg-[linear-gradient(135deg,#0b0f1a,#12182b,#0f1324)]" />
-
+        <div dir="rtl" className="min-h-screen">
             <div className="app-scroll h-full overflow-y-auto overflow-x-hidden pr-2 w-full">
                 <main className="mx-auto w-full px-6 pt-[130px] pb-16">
                     {loading && (
