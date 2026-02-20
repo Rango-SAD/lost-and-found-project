@@ -1,59 +1,36 @@
-import React, { useEffect, useState } from 'react';
-import { MapContainer, TileLayer, Polygon, Marker, Tooltip, useMapEvents } from 'react-leaflet';
-import L from 'leaflet';
+import React, { useState, useCallback, useMemo } from 'react';
+import { MapContainer, TileLayer, Polygon, Marker, Tooltip, useMapEvents, useMap } from 'react-leaflet';
 import 'leaflet/dist/leaflet.css';
 import { SHARIF_CENTER, OUTER_WORLD, SHARIF_BOUNDARY, BUILDINGS } from './mapData';
 import { PostCard } from '../posts/PostCard';
-import type { LostFoundPost } from '../../../Domain/Entities/LostFoundPost';
 import { useTheme } from '../../../ThemeContex';
+import { useMapItems } from '../../handlers/useMapItems';
+import { clusterItems, pinSizeFromZoom, labelFontFromZoom, makeClusterIcon, makeLabelIcon } from './mapUtils';
+import { mapRawItemToPost } from '../../../Domain/Types/mapTypes';
 
-function mapCategory(dbCategory: string): LostFoundPost["category"] {
-    const c = (dbCategory || "").toLowerCase();
-    if (c === "electronics") return "Electronics" as LostFoundPost["category"];
-    if (c === "documents")   return "Documents"   as LostFoundPost["category"];
-    if (c === "keys")        return "Keys"         as LostFoundPost["category"];
-    if (c === "clothing")    return "Clothing"     as LostFoundPost["category"];
-    if (c === "books")       return "Books"        as LostFoundPost["category"];
-    return "Other" as LostFoundPost["category"];
+
+function ZoomWatcher({ onZoomChange }: { onZoomChange: (z: number) => void }) {
+    const map = useMap();
+    React.useEffect(() => {
+        const handler = () => onZoomChange(map.getZoom());
+        handler();
+        map.on('zoomend', handler);
+        return () => { map.off('zoomend', handler); };
+    }, [map, onZoomChange]);
+    return null;
 }
 
-function mapDbItemToPost(item: any): LostFoundPost {
-    const type: LostFoundPost["type"] = item.status?.includes("گم") ? "LOST" : "FOUND";
-    const publishedAt = item.date ?? (item.timestamp ? new Date(item.timestamp).toLocaleString("fa-IR") : "");
-    return {
-        id:            item.id,
-        type,
-        status:        "Open",
-        category:      mapCategory(item.category),
-        itemName:      item.itemName,
-        tag:           item.tag,
-        location:      item.location ? `${item.location.lat}, ${item.location.lng}` : "—",
-        description:   item.description,
-        publisherName: "نام کاربری",
-        publishedAt,
-    };
-}
-
-
-const makePin = (color: string) => {
-    const svg = `<svg xmlns="http://www.w3.org/2000/svg" width="24" height="32" viewBox="0 0 24 32">
-        <path d="M12 1C6.477 1 2 5.477 2 11c0 7 10 20 10 20s10-13 10-20c0-5.523-4.477-10-10-10z"
-            fill="${color}" stroke="rgba(255,255,255,0.3)" stroke-width="1"/>
-        <circle cx="12" cy="11" r="4" fill="rgba(255,255,255,0.85)"/>
-    </svg>`;
-    return new L.Icon({
-        iconUrl: `data:image/svg+xml;charset=utf-8,${encodeURIComponent(svg)}`,
-        iconSize: [24, 32], iconAnchor: [12, 32], popupAnchor: [0, -34],
+function MapClickHandler({ selectable, onLocationSelect }: {
+    selectable?: boolean;
+    onLocationSelect?: (lat: number, lng: number) => void;
+}) {
+    useMapEvents({
+        click(e) {
+            if (selectable && onLocationSelect) onLocationSelect(e.latlng.lat, e.latlng.lng);
+        },
     });
-};
-
-const lostIcon  = makePin('#f43f5e');
-const foundIcon = makePin('#10b981');
-const emptyIcon = new L.Icon({
-    iconUrl: 'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mNkYAAAAAYAAjCB0C8AAAAASUVORK5CYII=',
-    iconSize: [1, 1],
-});
-
+    return null;
+}
 
 interface Props {
     selectable?: boolean;
@@ -61,55 +38,55 @@ interface Props {
     showExistingItems?: boolean;
 }
 
-const UniversityMap: React.FC<Props> = ({ selectable, onLocationSelect, showExistingItems }) => {
-    const [items, setItems] = useState<any[]>([]);
-    const [selectedPost, setSelectedPost] = useState<LostFoundPost | null>(null);
-    const { theme } = useTheme();
+const UniversityMap: React.FC<Props> = ({ selectable, onLocationSelect, showExistingItems = false }) => {
+    const [zoom, setZoom]                 = useState(16);
+    const [selectedPostId, setSelectedPostId] = useState<string | null>(null);
+    const { theme }                       = useTheme();
 
-    useEffect(() => {
-        if (showExistingItems) {
-            fetch('http://localhost:3001/lostAndFoundItems')
-                .then(res => res.json())
-                .then(data => setItems(data))
-                .catch(err => console.error("Error fetching items:", err));
-        }
-    }, [showExistingItems]);
+    const { items } = useMapItems(showExistingItems);
 
-    const MapEvents = () => {
-        useMapEvents({
-            click(e) {
-                if (selectable && onLocationSelect)
-                    onLocationSelect(e.latlng.lat, e.latlng.lng);
-            },
-        });
-        return null;
-    };
+    const handleZoom = useCallback((z: number) => setZoom(z), []);
+
+    const clusters = useMemo(
+        () => clusterItems(items.filter(i => i.location), zoom),
+        [items, zoom]
+    );
+
+    const pinSize   = pinSizeFromZoom(zoom);
+    const labelFont = labelFontFromZoom(zoom);
+    const outerFill = theme === 'light' ? '#DDE4EE' : '#020617';
+    const selectedPost = useMemo(() => {
+        if (!selectedPostId) return null;
+        const found = items.find(i => i.id === selectedPostId);
+        return found ? mapRawItemToPost(found) : null;
+    }, [selectedPostId, items]);
 
     return (
         <>
             <MapContainer
                 center={SHARIF_CENTER as [number, number]}
-                zoom={17}
+                zoom={16}
+                minZoom={14}
+                maxZoom={19}
                 zoomControl={false}
                 attributionControl={false}
                 style={{ height: '100%', width: '100%', background: 'transparent' }}
             >
                 <TileLayer
-                        url={
-                                  theme === "light"
-                                  ? "https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}{r}.png"
-                                   : "https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png"
-                            }
+                    url={
+                        theme === 'light'
+                            ? "https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}{r}.png"
+                            : "https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png"
+                    }
+                    maxNativeZoom={18}
+                    maxZoom={19}
                 />
-                <MapEvents />
+                <MapClickHandler selectable={selectable} onLocationSelect={onLocationSelect} />
+                <ZoomWatcher onZoomChange={handleZoom} />
 
-               <Polygon
+                <Polygon
                     positions={[OUTER_WORLD as any, SHARIF_BOUNDARY as any]}
-                    pathOptions={{
-                    fillColor: theme === "light" ? "#DDE4EE" : "#020617",
-                    fillOpacity: 0.9,
-                    weight: 0
-                      }}
+                    pathOptions={{ fillColor: outerFill, fillOpacity: 0.9, weight: 0 }}
                 />
                 <Polygon
                     positions={SHARIF_BOUNDARY as any}
@@ -117,38 +94,55 @@ const UniversityMap: React.FC<Props> = ({ selectable, onLocationSelect, showExis
                 />
 
                 {BUILDINGS.map((building, index) => (
-                    <Marker key={`building-${index}`} position={building.pos as [number, number]} icon={emptyIcon}>
-                        <Tooltip permanent direction="center" className="neon-label">{building.name}</Tooltip>
-                    </Marker>
+                    <Marker
+                        key={`b-${index}`}
+                        position={building.pos as [number, number]}
+                        icon={makeLabelIcon(building.name, labelFont, theme)}
+                    />
                 ))}
 
-                {showExistingItems && items.map((item) => (
-                    item.location && (
+                {clusters.map((cluster, idx) => {
+                    const isSingle    = cluster.items.length === 1;
+                    const icon        = makeClusterIcon(cluster.lostCount, cluster.foundCount, pinSize);
+                    const tooltipText = isSingle
+                        ? `${cluster.items[0].itemName} (${cluster.items[0].status})`
+                        : `${cluster.items.length} مورد · ${cluster.lostCount} گم‌شده · ${cluster.foundCount} پیدا‌شده`;
+
+                    return (
                         <Marker
-                            key={item.id}
-                            position={[item.location.lat, item.location.lng]}
-                            icon={item.status === 'گم شده' ? lostIcon : foundIcon}
-                            eventHandlers={{ click: () => setSelectedPost(mapDbItemToPost(item)) }}
+                            key={`c-${idx}`}
+                            position={[cluster.lat, cluster.lng]}
+                            icon={icon}
+                            eventHandlers={{
+                                click: () => setSelectedPostId(cluster.items[0].id)
+                            }}
                         >
-                            <Tooltip>{item.itemName} ({item.status})</Tooltip>
+                            {pinSize >= 22 && (
+                                <Tooltip
+                                    direction="top"
+                                    offset={[0, -(Math.round(pinSize * (isSingle ? 0.7 : 1) * 1.33) + 4)]}
+                                    opacity={0.92}
+                                >
+                                    {tooltipText}
+                                </Tooltip>
+                            )}
                         </Marker>
-                    )
-                ))}
+                    );
+                })}
             </MapContainer>
 
-           
             {selectedPost && (
                 <div
                     className="fixed inset-0 z-[999] flex items-center justify-center px-4"
-                    onClick={() => setSelectedPost(null)}
+                    onClick={() => setSelectedPostId(null)}
                 >
                     <div className="absolute inset-0 bg-black/55 backdrop-blur-sm" />
-                    <div onClick={(e) => e.stopPropagation()}>
+                    <div onClick={e => e.stopPropagation()}>
                         <PostCard
                             post={selectedPost}
                             onContact={(id, msg) => console.log("contact", id, msg)}
                             onReport={(id) => console.log("report", id)}
-                            onOpen={() => setSelectedPost(null)}
+                            onOpen={() => setSelectedPostId(null)}
                         />
                     </div>
                 </div>
