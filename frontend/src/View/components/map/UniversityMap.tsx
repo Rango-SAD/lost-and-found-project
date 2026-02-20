@@ -3,12 +3,11 @@ import { MapContainer, TileLayer, Polygon, Marker, Tooltip, useMapEvents, useMap
 import 'leaflet/dist/leaflet.css';
 import { SHARIF_CENTER, OUTER_WORLD, SHARIF_BOUNDARY, BUILDINGS } from './mapData';
 import { PostCard } from '../posts/PostCard';
-import { useTheme } from '../../../ThemeContex';
+import { useTheme } from '../../../Infrastructure/Contexts/ThemeContext';
 import { useMapItems } from '../../handlers/useMapItems';
 import { clusterItems, pinSizeFromZoom, labelFontFromZoom } from './mapUtils';
 import { makeClusterIcon, makeLabelIcon } from './mapIcons';
-import { mapRawItemToPost } from '../../../Domain/Types/mapTypes';
-import type { MapProps } from '../../../Domain/Types/mapTypes';
+import { mapRawItemToPost, type MapProps } from '../../../Domain/Types/mapTypes';
 
 
 function ZoomWatcher({ onZoomChange }: { onZoomChange: (z: number) => void }) {
