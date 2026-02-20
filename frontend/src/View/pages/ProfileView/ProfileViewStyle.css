@@ -10,10 +10,10 @@
 
 .profile-avatar {
     @apply w-16 h-16 rounded-full flex items-center justify-center;
-    background: linear-gradient(135deg, var(--surface-1) 0%, var(--surface-3) 100%);
+    background: var(--surface-2);
     backdrop-filter: blur(20px);
     color: var(--text-primary);
-    border: 0;
+    border: 1px solid var(--border-soft);
     position: relative;
     overflow: visible;
 }
@@ -29,68 +29,79 @@
 
 .item-card {
     @apply relative rounded-[1.75rem] overflow-visible transition-all duration-300 cursor-pointer;
-    background: linear-gradient(135deg, var(--surface-1) 0%, var(--surface-3) 100%);
+    background: var(--surface-2);
     backdrop-filter: blur(20px);
-    border: 0;
-    box-shadow: var(--shadow-card), var(--inset-top), var(--inset-bottom);
+    border: 1px solid var(--border-soft);
+    box-shadow: 0 8px 32px var(--overlay);
 }
 
 .item-card::before {
     content: '';
     position: absolute;
-    top: 0; left: 0; right: 0;
+    top: 0;
+    left: 0;
+    right: 0;
     height: 50%;
-    background: linear-gradient(180deg, var(--surface-hover) 0%, transparent 100%);
+    background: linear-gradient(
+        180deg,
+        rgba(255, 255, 255, 0.05) 0%,
+        transparent 100%
+    );
     pointer-events: none;
     border-radius: 1.75rem 1.75rem 0 0;
     z-index: 1;
 }
 
-.item-card:hover { transform: translateY(-4px); }
+.item-card:hover {
+    transform: translateY(-4px);
+}
 
 .category-badge {
     @apply absolute top-4 left-4 z-20 px-3 py-1 rounded-full text-xs font-medium;
     backdrop-filter: blur(10px);
 }
 
-.category-electronics { background: rgba(0,245,255,0.15);   color: #00f5ff; border: 1px solid rgba(0,245,255,0.35); }
-.category-documents   { background: rgba(77,124,255,0.15);  color: #4d7cff; border: 1px solid rgba(77,124,255,0.35); }
-.category-wallets     { background: rgba(57,255,136,0.15);  color: #39ff88; border: 1px solid rgba(57,255,136,0.35); }
-.category-clothing    { background: rgba(255,79,216,0.15);  color: #ff4fd8; border: 1px solid rgba(255,79,216,0.35); }
-.category-accessories { background: rgba(155,92,255,0.15);  color: #9b5cff; border: 1px solid rgba(155,92,255,0.35); }
-.category-keys        { background: rgba(255,227,71,0.15);  color: #ffe347; border: 1px solid rgba(255,227,71,0.35); }
-.category-books       { background: rgba(255,159,67,0.15);  color: #ff9f43; border: 1px solid rgba(255,159,67,0.35); }
-.category-other       { background: rgba(255,92,92,0.15);   color: #ff5c5c; border: 1px solid rgba(255,92,92,0.35); }
+.category-electronics { background: rgba(0, 245, 255, 0.2); color: #00f5ff; border: 1px solid rgba(0, 245, 255, 0.4); }
+.category-documents { background: rgba(77, 124, 255, 0.2); color: #4d7cff; border: 1px solid rgba(77, 124, 255, 0.4); }
+.category-wallets { background: rgba(57, 255, 136, 0.2); color: #39ff88; border: 1px solid rgba(57, 255, 136, 0.4); }
+.category-clothing { background: rgba(255, 79, 216, 0.2); color: #ff4fd8; border: 1px solid rgba(255, 79, 216, 0.4); }
+.category-accessories { background: rgba(155, 92, 255, 0.2); color: #9b5cff; border: 1px solid rgba(155, 92, 255, 0.4); }
+.category-keys { background: rgba(255, 227, 71, 0.2); color: #ffe347; border: 1px solid rgba(255, 227, 71, 0.4); }
+.category-books { background: rgba(255, 159, 67, 0.2); color: #ff9f43; border: 1px solid rgba(255, 159, 67, 0.4); }
+.category-other { background: rgba(255, 92, 92, 0.2); color: #ff5c5c; border: 1px solid rgba(255, 92, 92, 0.4); }
 
-.card-menu { @apply absolute top-4 right-4 z-20; }
+.card-menu {
+    @apply absolute top-4 right-4 z-20;
+}
 
 .menu-button {
     @apply w-10 h-10 flex items-center justify-center text-2xl transition-all;
-    color: var(--text-secondary);
+    color: var(--text-primary);
     font-weight: bold;
     letter-spacing: 0.1em;
     line-height: 1;
     text-align: center;
-    background: none;
-    border: none;
-    backdrop-filter: none;
-    padding: 0;
+    background: none; 
+    border: none;     
+    backdrop-filter: none; 
+    padding: 0;     
 }
 
 .menu-button:hover {
     color: var(--text-primary);
-    font-weight: 800;
-    transform: scale(1.1);
+    filter: brightness(1.3);
+    font-weight: 800;     
+    transform: scale(1.1); 
     transition: all 0.2s ease-in-out;
 }
 
 .menu-dropdown {
     @apply absolute top-10 right-0 rounded-xl overflow-hidden;
     min-width: 140px;
-    background: linear-gradient(135deg, var(--surface-1) 0%, var(--surface-2) 100%);
+    background: var(--surface-2);
     backdrop-filter: blur(20px);
-    border: 1px solid var(--border-strong);
-    box-shadow: var(--shadow-card);
+    border: 1px solid var(--border-medium);
+    box-shadow: 0 8px 32px var(--overlay);
 }
 
 .menu-item {
@@ -101,27 +112,31 @@
 }
 
 .menu-item:hover {
-    background: var(--surface-hover);
+    background: var(--surface-3);
     color: var(--text-primary);
 }
 
 .menu-item.edit:hover {
-    background: rgba(59,130,246,0.08);
+    background: rgba(59, 130, 246, 0.1);
     color: #4d7cff;
 }
 
 .menu-item.delete:hover {
-    background: rgba(239,68,68,0.08);
+    background: rgba(239, 68, 68, 0.1);
     color: #ff5c5c;
 }
 
-.menu-item span { @apply text-base; }
+.menu-item span {
+    @apply text-base;
+}
 
-.card-image-wrapper { @apply w-full flex items-center justify-center p-3 pt-8; }
+.card-image-wrapper {
+    @apply w-full flex items-center justify-center p-3 pt-8;
+}
 
 .card-image {
     @apply w-36 h-36 flex items-center justify-center rounded-xl overflow-hidden;
-    background: linear-gradient(135deg, var(--surface-2) 0%, var(--surface-3) 100%);
+    background: var(--surface-3);
 }
 
 .card-photo {
@@ -139,7 +154,9 @@
     direction: rtl;
 }
 
-.card-header { @apply flex items-center justify-between gap-2 mb-2; }
+.card-header {
+    @apply flex items-center justify-between gap-2 mb-2;
+}
 
 .card-title {
     @apply text-base font-bold flex-1;
@@ -148,9 +165,9 @@
 
 .card-tag {
     @apply px-2 py-1 rounded-md text-[9px] font-medium whitespace-nowrap;
-    background: var(--surface-1);
+    background: var(--surface-3);
     color: var(--text-secondary);
-    border: 1px solid var(--border-color);
+    border: 1px solid var(--border-soft);
 }
 
 .card-description {
@@ -160,16 +177,16 @@
 
 .delete-modal-overlay {
     @apply fixed inset-0 z-50 flex items-center justify-center p-4;
-    background: var(--modal-overlay);
+    background: var(--overlay);
     backdrop-filter: blur(8px);
 }
 
 .delete-modal {
     @apply rounded-[2rem] p-8 max-w-md w-full relative overflow-visible;
-    background: linear-gradient(135deg, var(--surface-1) 0%, var(--surface-2) 100%);
+    background: var(--surface-2);
     backdrop-filter: blur(30px);
-    border: 0;
-    box-shadow: var(--delete-modal-shadow), var(--inset-top);
+    border: 1px solid var(--border-medium);
+    box-shadow: 0 8px 32px var(--overlay);
 }
 
 .modal-title {
@@ -182,7 +199,9 @@
     color: var(--text-secondary);
 }
 
-.modal-actions { @apply flex gap-4 justify-end; }
+.modal-actions {
+    @apply flex gap-4 justify-end;
+}
 
 .modal-btn {
     @apply px-6 py-3 rounded-xl text-sm font-medium transition-all;
@@ -190,23 +209,24 @@
 }
 
 .modal-btn.cancel {
-    background: var(--surface-1);
+    background: var(--surface-3);
     color: var(--text-secondary);
-    border: 1px solid var(--border-color);
+    border: 1px solid var(--border-soft);
 }
 
 .modal-btn.cancel:hover {
-    background: var(--surface-hover);
+    background: var(--surface-2);
     color: var(--text-primary);
+    border: 1px solid var(--border-medium);
 }
 
 .modal-btn.confirm {
-    background: linear-gradient(135deg, rgba(239,68,68,0.20), rgba(239,68,68,0.10));
+    background: linear-gradient(135deg, rgba(239, 68, 68, 0.2), rgba(239, 68, 68, 0.1));
     color: #ff5c5c;
-    border: 1px solid rgba(239,68,68,0.40);
+    border: 1px solid rgba(239, 68, 68, 0.4);
 }
 
 .modal-btn.confirm:hover {
-    background: linear-gradient(135deg, rgba(239,68,68,0.30), rgba(239,68,68,0.15));
-    border: 1px solid rgba(239,68,68,0.60);
+    background: linear-gradient(135deg, rgba(239, 68, 68, 0.3), rgba(239, 68, 68, 0.15));
+    border: 1px solid rgba(239, 68, 68, 0.6);
 }
