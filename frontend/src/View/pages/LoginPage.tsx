@@ -101,7 +101,7 @@ export function LoginPage() {
                   حساب کاربری ندارید؟{" "}
                   <button
                     type="button"
-                    onClick={() => navigate("/register/code")}
+                    onClick={() => navigate("/register/verify")}
                     className="text-white/80 underline underline-offset-4 decoration-white/40 hover:decoration-white/70 hover:text-white"
                   >
                     ثبت نام کنید

@@ -4,6 +4,7 @@ from src.api.routes.auth_routes import router as auth_router
 from motor.motor_asyncio import AsyncIOMotorClient
 from beanie import init_beanie
 from src.infrastructure.database.models.user_document import UserDocument
+from src.infrastructure.database.models.otp_document import OTPDocument 
 from src.infrastructure.security.auth_handler import AuthHandler
 
 app = FastAPI(title="Lost and Found University System") 
@@ -21,7 +22,10 @@ app.include_router(auth_router)
 @app.on_event("startup")
 async def auth_db():
     client = AsyncIOMotorClient("mongodb://localhost:27017")
-    await init_beanie(database=client.lost_and_found_v2, document_models=[UserDocument])
+    await init_beanie(
+        database=client.lost_and_found_v2, 
+        document_models=[UserDocument, OTPDocument]
+    )
     
     existing_user = await UserDocument.find_one(UserDocument.username == "admin")
     if not existing_user:
@@ -32,7 +36,7 @@ async def auth_db():
             email="admin@test.com"
         )
         await admin_user.insert()
-        print("✅ Test user 'admin' created successfully.")
+        print("Test user 'admin' created successfully.")
 
 @app.get("/")
 def read_root():
