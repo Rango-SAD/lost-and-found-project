@@ -1,4 +1,13 @@
-fastapi
-uvicorn[standard]
-pymongo
-python-dotenv
+fastapi==0.110.0
+uvicorn[standard]==0.27.1
+
+pydantic==2.6.1
+pydantic-settings==2.2.1
+
+beanie==1.25.0
+motor==3.3.2
+pymongo==4.6.1
+
+python-dotenv==1.0.1
+
+typing-extensions==4.9.0
