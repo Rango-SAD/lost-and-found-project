@@ -10,13 +10,9 @@
 
 .profile-avatar {
     @apply w-16 h-16 rounded-full flex items-center justify-center;
-    background: linear-gradient(
-        135deg,
-        rgba(255, 255, 255, 0.08) 0%,
-        rgba(255, 255, 255, 0.02) 100%
-    );
+    background: linear-gradient(135deg, var(--surface-1) 0%, var(--surface-3) 100%);
     backdrop-filter: blur(20px);
-    color: #e8ecff;
+    color: var(--text-primary);
     border: 0;
     position: relative;
     overflow: visible;
@@ -24,7 +20,7 @@
 
 .profile-title {
     @apply text-xl font-bold;
-    color: #e8ecff;
+    color: var(--text-primary);
 }
 
 .items-grid {
@@ -33,130 +29,99 @@
 
 .item-card {
     @apply relative rounded-[1.75rem] overflow-visible transition-all duration-300 cursor-pointer;
-    background: linear-gradient(
-        135deg,
-        rgba(255, 255, 255, 0.08) 0%,
-        rgba(255, 255, 255, 0.02) 100%
-    );
+    background: linear-gradient(135deg, var(--surface-1) 0%, var(--surface-3) 100%);
     backdrop-filter: blur(20px);
     border: 0;
-    box-shadow: 
-        0 8px 32px rgba(0, 0, 0, 0.3),
-        inset 0 1px 0 rgba(255, 255, 255, 0.2),
-        inset 0 -1px 0 rgba(0, 0, 0, 0.1);
+    box-shadow: var(--shadow-card), var(--inset-top), var(--inset-bottom);
 }
 
 .item-card::before {
     content: '';
     position: absolute;
-    top: 0;
-    left: 0;
-    right: 0;
+    top: 0; left: 0; right: 0;
     height: 50%;
-    background: linear-gradient(
-        180deg,
-        rgba(255, 255, 255, 0.1) 0%,
-        transparent 100%
-    );
+    background: linear-gradient(180deg, var(--surface-hover) 0%, transparent 100%);
     pointer-events: none;
     border-radius: 1.75rem 1.75rem 0 0;
     z-index: 1;
 }
 
-.item-card:hover {
-    transform: translateY(-4px);
-}
+.item-card:hover { transform: translateY(-4px); }
 
 .category-badge {
     @apply absolute top-4 left-4 z-20 px-3 py-1 rounded-full text-xs font-medium;
     backdrop-filter: blur(10px);
 }
 
-.category-electronics { background: rgba(0, 245, 255, 0.2); color: #00f5ff; border: 1px solid rgba(0, 245, 255, 0.4); }
-.category-documents { background: rgba(77, 124, 255, 0.2); color: #4d7cff; border: 1px solid rgba(77, 124, 255, 0.4); }
-.category-wallets { background: rgba(57, 255, 136, 0.2); color: #39ff88; border: 1px solid rgba(57, 255, 136, 0.4); }
-.category-clothing { background: rgba(255, 79, 216, 0.2); color: #ff4fd8; border: 1px solid rgba(255, 79, 216, 0.4); }
-.category-accessories { background: rgba(155, 92, 255, 0.2); color: #9b5cff; border: 1px solid rgba(155, 92, 255, 0.4); }
-.category-keys { background: rgba(255, 227, 71, 0.2); color: #ffe347; border: 1px solid rgba(255, 227, 71, 0.4); }
-.category-books { background: rgba(255, 159, 67, 0.2); color: #ff9f43; border: 1px solid rgba(255, 159, 67, 0.4); }
-.category-other { background: rgba(255, 92, 92, 0.2); color: #ff5c5c; border: 1px solid rgba(255, 92, 92, 0.4); }
+.category-electronics { background: rgba(0,245,255,0.15);   color: #00f5ff; border: 1px solid rgba(0,245,255,0.35); }
+.category-documents   { background: rgba(77,124,255,0.15);  color: #4d7cff; border: 1px solid rgba(77,124,255,0.35); }
+.category-wallets     { background: rgba(57,255,136,0.15);  color: #39ff88; border: 1px solid rgba(57,255,136,0.35); }
+.category-clothing    { background: rgba(255,79,216,0.15);  color: #ff4fd8; border: 1px solid rgba(255,79,216,0.35); }
+.category-accessories { background: rgba(155,92,255,0.15);  color: #9b5cff; border: 1px solid rgba(155,92,255,0.35); }
+.category-keys        { background: rgba(255,227,71,0.15);  color: #ffe347; border: 1px solid rgba(255,227,71,0.35); }
+.category-books       { background: rgba(255,159,67,0.15);  color: #ff9f43; border: 1px solid rgba(255,159,67,0.35); }
+.category-other       { background: rgba(255,92,92,0.15);   color: #ff5c5c; border: 1px solid rgba(255,92,92,0.35); }
 
-.card-menu {
-    @apply absolute top-4 right-4 z-20;
-}
+.card-menu { @apply absolute top-4 right-4 z-20; }
 
 .menu-button {
     @apply w-10 h-10 flex items-center justify-center text-2xl transition-all;
-    color: #e8ecff;
+    color: var(--text-secondary);
     font-weight: bold;
     letter-spacing: 0.1em;
     line-height: 1;
     text-align: center;
-    background: none; 
-    border: none;     
-    backdrop-filter: none; 
-    padding: 0;     
+    background: none;
+    border: none;
+    backdrop-filter: none;
+    padding: 0;
 }
 
-
-
 .menu-button:hover {
-    color: #ffffff;      
-    font-weight: 800;     
-    transform: scale(1.1); 
+    color: var(--text-primary);
+    font-weight: 800;
+    transform: scale(1.1);
     transition: all 0.2s ease-in-out;
 }
 
 .menu-dropdown {
     @apply absolute top-10 right-0 rounded-xl overflow-hidden;
     min-width: 140px;
-    background: linear-gradient(
-        135deg,
-        rgba(255, 255, 255, 0.12) 0%,
-        rgba(255, 255, 255, 0.06) 100%
-    );
+    background: linear-gradient(135deg, var(--surface-1) 0%, var(--surface-2) 100%);
     backdrop-filter: blur(20px);
-    border: 1px solid rgba(255, 255, 255, 0.2);
-    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
+    border: 1px solid var(--border-strong);
+    box-shadow: var(--shadow-card);
 }
 
 .menu-item {
     @apply w-full px-4 py-3 flex items-center gap-3 text-sm transition-all;
-    color: #aab0d6;
+    color: var(--text-secondary);
     border: none;
     background: transparent;
 }
 
 .menu-item:hover {
-    background: rgba(255, 255, 255, 0.1);
-    color: #e8ecff;
+    background: var(--surface-hover);
+    color: var(--text-primary);
 }
 
 .menu-item.edit:hover {
-    background: rgba(59, 130, 246, 0.1);
+    background: rgba(59,130,246,0.08);
     color: #4d7cff;
 }
 
 .menu-item.delete:hover {
-    background: rgba(239, 68, 68, 0.1);
+    background: rgba(239,68,68,0.08);
     color: #ff5c5c;
 }
 
-.menu-item span {
-    @apply text-base;
-}
+.menu-item span { @apply text-base; }
 
-.card-image-wrapper {
-    @apply w-full flex items-center justify-center p-3 pt-8;
-}
+.card-image-wrapper { @apply w-full flex items-center justify-center p-3 pt-8; }
 
 .card-image {
     @apply w-36 h-36 flex items-center justify-center rounded-xl overflow-hidden;
-    background: linear-gradient(
-        135deg,
-        rgba(255, 255, 255, 0.05) 0%,
-        rgba(255, 255, 255, 0.01) 100%
-    );
+    background: linear-gradient(135deg, var(--surface-2) 0%, var(--surface-3) 100%);
 }
 
 .card-photo {
@@ -166,7 +131,7 @@
 
 .placeholder-icon {
     @apply w-14 h-14;
-    color: #6f76a8;
+    color: var(--text-muted);
 }
 
 .card-content {
@@ -174,60 +139,50 @@
     direction: rtl;
 }
 
-.card-header {
-    @apply flex items-center justify-between gap-2 mb-2;
-}
+.card-header { @apply flex items-center justify-between gap-2 mb-2; }
 
 .card-title {
     @apply text-base font-bold flex-1;
-    color: #e8ecff;
+    color: var(--text-primary);
 }
 
 .card-tag {
     @apply px-2 py-1 rounded-md text-[9px] font-medium whitespace-nowrap;
-    background: rgba(255, 255, 255, 0.1);
-    color: #aab0d6;
-    border: 1px solid rgba(255, 255, 255, 0.15);
+    background: var(--surface-1);
+    color: var(--text-secondary);
+    border: 1px solid var(--border-color);
 }
 
 .card-description {
     @apply text-xs line-clamp-2 leading-relaxed;
-    color: #6f76a8;
+    color: var(--text-muted);
 }
 
 .delete-modal-overlay {
     @apply fixed inset-0 z-50 flex items-center justify-center p-4;
-    background: rgba(0, 0, 0, 0.7);
+    background: var(--modal-overlay);
     backdrop-filter: blur(8px);
 }
 
 .delete-modal {
     @apply rounded-[2rem] p-8 max-w-md w-full relative overflow-visible;
-    background: linear-gradient(
-        135deg,
-        rgba(255, 255, 255, 0.12) 0%,
-        rgba(255, 255, 255, 0.06) 100%
-    );
+    background: linear-gradient(135deg, var(--surface-1) 0%, var(--surface-2) 100%);
     backdrop-filter: blur(30px);
     border: 0;
-    box-shadow: 
-        0 8px 32px rgba(0, 0, 0, 0.4),
-        inset 0 1px 0 rgba(255, 255, 255, 0.2);
+    box-shadow: var(--delete-modal-shadow), var(--inset-top);
 }
 
 .modal-title {
     @apply text-xl font-bold mb-3;
-    color: #e8ecff;
+    color: var(--text-primary);
 }
 
 .modal-text {
     @apply text-sm mb-6;
-    color: #aab0d6;
+    color: var(--text-secondary);
 }
 
-.modal-actions {
-    @apply flex gap-4 justify-end;
-}
+.modal-actions { @apply flex gap-4 justify-end; }
 
 .modal-btn {
     @apply px-6 py-3 rounded-xl text-sm font-medium transition-all;
@@ -235,23 +190,23 @@
 }
 
 .modal-btn.cancel {
-    background: rgba(255, 255, 255, 0.1);
-    color: #aab0d6;
-    border: 1px solid rgba(255, 255, 255, 0.2);
+    background: var(--surface-1);
+    color: var(--text-secondary);
+    border: 1px solid var(--border-color);
 }
 
 .modal-btn.cancel:hover {
-    background: rgba(255, 255, 255, 0.15);
-    color: #e8ecff;
+    background: var(--surface-hover);
+    color: var(--text-primary);
 }
 
 .modal-btn.confirm {
-    background: linear-gradient(135deg, rgba(239, 68, 68, 0.2), rgba(239, 68, 68, 0.1));
+    background: linear-gradient(135deg, rgba(239,68,68,0.20), rgba(239,68,68,0.10));
     color: #ff5c5c;
-    border: 1px solid rgba(239, 68, 68, 0.4);
+    border: 1px solid rgba(239,68,68,0.40);
 }
 
 .modal-btn.confirm:hover {
-    background: linear-gradient(135deg, rgba(239, 68, 68, 0.3), rgba(239, 68, 68, 0.15));
-    border: 1px solid rgba(239, 68, 68, 0.6);
+    background: linear-gradient(135deg, rgba(239,68,68,0.30), rgba(239,68,68,0.15));
+    border: 1px solid rgba(239,68,68,0.60);
 }

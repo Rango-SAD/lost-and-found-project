@@ -7,6 +7,7 @@ import { GlassCard } from "../components/GlassCard"
 import { TextField } from "../components/TextField"
 import { PrimaryButton } from "../components/PrimaryButton"
 import logo from "../assets/logo.png"
+import { useTheme } from '../../Infrastructure/Contexts/ThemeContext';
 
 function UserIcon() {
   return (
@@ -48,12 +49,31 @@ export function LoginPage() {
 
   const { login, loading, error } = useLoginVM()
   const navigate = useNavigate()
+  const { theme, toggleTheme } = useTheme()
 
   return (
-    <div
-      dir="rtl"
-      className="min-h-screen flex items-center justify-center bg-[linear-gradient(45deg,rgba(18,24,43,0.5)_0%,rgba(16,21,39,0.77)_0%,rgba(15,19,36,1)_63%,rgba(14,18,34,0.77)_100%,rgba(11,15,26,0)_100%)]"
-    >
+    <div dir="rtl" className="min-h-screen flex items-center justify-center">
+      <button
+         onClick={toggleTheme}
+         className="fixed top-6 left-6 z-50 rounded-full p-3 transition-all"
+         style={{
+           background: "var(--surface-2)",
+           border: "1px solid var(--border-soft)",
+           color: "var(--text-primary)"
+         }}
+        title={theme === "dark" ? "حالت روشن" : "حالت تاریک"}
+      >
+        {theme === "dark" ? (
+           <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+             <circle cx="12" cy="12" r="5"/>
+             <path d="M12 1v2M12 21v2M4.22 4.22l1.42 1.42M18.36 18.36l1.42 1.42M1 12h2M21 12h2M4.22 19.78l1.42-1.42M18.36 5.64l1.42-1.42"/>
+           </svg>
+        ) : (
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+            <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/>
+          </svg>
+         )}
+        </button>
       <GlassCard className="w-full max-w-[1200px] min-h-[640px]">
         <div className="grid grid-cols-1 md:grid-cols-2 gap-14 p-10 md:p-14">
           <div className="order-1 md:order-2 flex flex-col justify-center items-center text-center">
@@ -64,17 +84,17 @@ export function LoginPage() {
             />
 
             <div className="-mt-20 flex flex-col items-center text-center">
-              <p className="text-3xl font-extrabold text-white/90">
+              <p className="text-3xl font-extrabold" style={{ color: "var(--text-primary)" }}>
                 گمشده‌ها تنها نمی‌مانند؛
               </p>
-              <p className="mt-4 text-[22px] font-medium text-white/65">
+              <p className="mt-4 text-[22px] font-medium" style={{ color: "var(--text-secondary)" }}>
                 اینجا دوباره پیدا می‌شوند.
               </p>
             </div>
           </div>
 
           <div className="order-2 md:order-1 flex flex-col justify-center mt-28">
-            <h1 className="mb-10 mr-[200px] text-4xl font-extrabold text-white/90">
+            <h1 className="mb-10 mr-[200px] text-4xl font-extrabold" style={{ color: "var(--text-primary)" }}>
               وارد شوید
             </h1>
 
@@ -97,13 +117,15 @@ export function LoginPage() {
               {error ? <p className="text-sm text-red-300">{error}</p> : null}
 
               <div className="pt-4 flex items-center justify-between gap-6">
-                <div className="text-sm text-white/55 text-right">
-                  حساب کاربری ندارید؟{" "}
-                  <button
-                    type="button"
-                    onClick={() => navigate("/register/code")}
-                    className="text-white/80 underline underline-offset-4 decoration-white/40 hover:decoration-white/70 hover:text-white"
+                <div className="text-sm text-right" style={{ color: "var(--text-secondary)" }}>
+                   حساب کاربری ندارید؟{" "}
+                   <button
+                       type="button"
+                       onClick={() => navigate("/register/code")}
+                       style={{ color: "var(--text-primary)" }}
+                       className="underline underline-offset-4 hover:opacity-80"
                   >
+
                     ثبت نام کنید
                   </button>
                 </div>
