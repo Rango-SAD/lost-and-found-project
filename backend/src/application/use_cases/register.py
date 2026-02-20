@@ -1,4 +1,4 @@
-from datetime import datetime, timedelta
+from datetime import datetime, timedelta, timezone
 from fastapi import HTTPException
 from src.infrastructure.database.models.otp_document import OTPDocument
 from src.infrastructure.database.models.user_document import UserDocument
@@ -13,7 +13,7 @@ class RegisterUseCase:
             raise HTTPException(status_code=400, detail="User with this email already exists")
 
         otp = EmailHandler.generate_otp()
-        expires = datetime.utcnow() + timedelta(minutes=5)
+        expires = datetime.now(timezone.utc) + timedelta(minutes=5)
         
         otp_entry = await OTPDocument.find_one(OTPDocument.email == email)
         if otp_entry:
@@ -37,7 +37,7 @@ class RegisterUseCase:
         if not otp_entry:
             raise HTTPException(status_code=400, detail="Invalid or incorrect OTP code")
 
-        if otp_entry.expire_at < datetime.utcnow():
+        if otp_entry.expire_at.replace(tzinfo=timezone.utc) < datetime.now(timezone.utc):
             await otp_entry.delete()
             raise HTTPException(status_code=400, detail="OTP has expired")
 
