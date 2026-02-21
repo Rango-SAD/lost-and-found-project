@@ -1,6 +1,7 @@
 import { useState } from "react";
 import { cn } from "../../../Infrastructure/Utility/cn";
 import { useTheme } from "../../../Infrastructure/Contexts/ThemeContext";
+import { MoreVertical, ShieldAlert, X, AlertTriangle } from "lucide-react";
 
 export type Comment = {
     id: string;
@@ -16,26 +17,19 @@ type Props = {
 };
 
 const MOCK_COMMENTS: Comment[] = [
-    {
-        id: "1",
-        username: "علی محمدی",
-        text: "این وسیله رو دیدم، لطفاً تماس بگیرید",
-        createdAt: "۱۴۰۴/۱۲/۰۱",
-    },
-    {
-        id: "2",
-        username: "سارا رضایی",
-        text: "ممنون از اطلاع‌رسانی",
-        createdAt: "۱۴۰۴/۱۲/۰۲",
-    },
+    { id: "1", username: "علی محمدی", text: "این وسیله رو دیدم، لطفاً تماس بگیرید", createdAt: "۱۴۰۴/۱۲/۰۱" },
+    { id: "2", username: "سارا رضایی", text: "ممنون از اطلاع‌رسانی", createdAt: "۱۴۰۴/۱۲/۰۲" },
 ];
 
 export function CommentSection({ postId, onClose }: Props) {
     const { theme } = useTheme();
     const [comments, setComments] = useState<Comment[]>(MOCK_COMMENTS);
     const [text, setText] = useState("");
+    
+    const [activeMenu, setActiveMenu] = useState<string | null>(null);
+    const [reportingCommentId, setReportingCommentId] = useState<string | null>(null);
 
-    const currentUser = { username: "کاربر ", avatarUrl: undefined };
+    const currentUser = { username: "کاربر جاری", avatarUrl: undefined };
 
     function handleSubmit() {
         const trimmed = text.trim();
@@ -53,161 +47,143 @@ export function CommentSection({ postId, onClose }: Props) {
         setText("");
     }
 
-    const surface =
-        theme === "light"
-            ? "rgba(244,247,251,0.97)"
-            : "rgba(18,24,43,0.97)";
+    const handleReportSubmit = () => {
+        console.log("گزارش تخلف برای کامنت:", reportingCommentId);
+        setReportingCommentId(null);
+        setActiveMenu(null);
+    };
 
     return (
-        <div
-            dir="rtl"
-            className="flex flex-col h-full"
-            style={{
-                background: surface,
-                borderLeft: "1px solid var(--border-soft)",
-            }}
-        >
-            <div
-                className="flex items-center justify-between px-5 py-4 border-b"
-                style={{ borderColor: "var(--border-soft)" }}
-            >
-                <span
-                    className="text-[15px] font-semibold"
-                    style={{ color: "var(--text-primary)" }}
-                >
+        <div dir="rtl" className="flex flex-col h-full w-full relative overflow-hidden">
+            
+            <div className="flex items-center justify-between px-6 py-5 border-b border-white/5 bg-transparent shrink-0">
+                <span className="text-[16px] font-bold text-slate-700 dark:text-slate-100">
                     کامنت‌ها
                 </span>
-                <button
-                    type="button"
-                    onClick={onClose}
-                    className="grid h-8 w-8 place-items-center rounded-full transition-opacity hover:opacity-70"
-                    style={{
-                        background: "var(--surface-2)",
-                        border: "1px solid var(--border-soft)",
-                        color: "var(--text-secondary)",
-                    }}
-                    aria-label="بستن کامنت‌ها"
+                <button 
+                    onClick={onClose} 
+                    className="p-2 rounded-full hover:bg-black/5 dark:hover:bg-white/5 transition-colors"
                 >
-                    <svg width="14" height="14" viewBox="0 0 14 14" fill="none">
-                        <path
-                            d="M1 1l12 12M13 1L1 13"
-                            stroke="currentColor"
-                            strokeWidth="1.8"
-                            strokeLinecap="round"
-                        />
-                    </svg>
+                    <X className="w-5 h-5 opacity-50" />
                 </button>
             </div>
 
-            <div className="flex-1 overflow-y-auto px-5 py-4 space-y-5">
-                {comments.length === 0 && (
-                    <div
-                        className="text-center text-[13px] pt-8"
-                        style={{ color: "var(--text-muted)" }}
-                    >
-                        هنوز کامنتی ثبت نشده
-                    </div>
-                )}
-                {comments.map((c) => (
-                    <div key={c.id} className="flex items-start gap-3">
-                        <div
-                            className="grid h-9 w-9 shrink-0 place-items-center rounded-full ring-1"
-                            style={{
-                                background: "var(--surface-2)",
-                                borderColor: "var(--border-soft)",
-                                color: "var(--text-muted)",
-                            }}
-                        >
-                            {c.avatarUrl ? (
-                                <img
-                                    src={c.avatarUrl}
-                                    alt={c.username}
-                                    className="h-full w-full rounded-full object-cover"
-                                />
-                            ) : (
-                                <svg width="16" height="16" viewBox="0 0 24 24" fill="none">
-                                    <path
-                                        d="M12 12a4 4 0 1 0-4-4 4 4 0 0 0 4 4Z"
-                                        stroke="currentColor"
-                                        strokeWidth="1.6"
-                                    />
-                                    <path
-                                        d="M20 20a8 8 0 1 0-16 0"
-                                        stroke="currentColor"
-                                        strokeWidth="1.6"
-                                    />
+            <div className="flex-1 overflow-y-auto px-6 py-6 space-y-8 scrollbar-thin scrollbar-thumb-slate-300 dark:scrollbar-thumb-white/10">
+                {comments.length === 0 ? (
+                    <div className="text-center text-[13px] pt-10 opacity-30">هنوز کامنتی ثبت نشده</div>
+                ) : (
+                    comments.map((c) => (
+                        <div key={c.id} className="group relative flex items-start gap-3">
+                            <div className="grid h-10 w-10 shrink-0 place-items-center rounded-full bg-slate-200 dark:bg-white/5 text-slate-400 border border-black/5 dark:border-white/5">
+                                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5">
+                                    <path d="M12 12a4 4 0 1 0-4-4 4 4 0 0 0 4 4Z" />
+                                    <path d="M20 20a8 8 0 1 0-16 0" />
                                 </svg>
-                            )}
-                        </div>
+                            </div>
 
-                        <div className="flex-1 text-right">
-                            <div
-                                className="text-[13px] font-semibold"
-                                style={{ color: "var(--text-primary)" }}
-                            >
-                                {c.username}
-                            </div>
-                            <div
-                                className="mt-1 text-[13px] leading-6"
-                                style={{ color: "var(--text-secondary)" }}
-                            >
-                                {c.text}
-                            </div>
-                            <div
-                                className="mt-1 text-[11px]"
-                                style={{ color: "var(--text-muted)" }}
-                            >
-                                {c.createdAt}
+                            <div className="flex-1">
+                                <div className="flex items-center justify-between">
+                                    <span className="text-[13px] font-bold dark:text-white">{c.username}</span>
+                                    
+                                    <div className="relative">
+                                        <button 
+                                            onClick={() => setActiveMenu(activeMenu === c.id ? null : c.id)}
+                                            className="p-1 opacity-0 group-hover:opacity-100 hover:bg-black/5 dark:hover:bg-white/5 rounded-md transition-all"
+                                        >
+                                            <MoreVertical className="w-4 h-4 opacity-40" />
+                                        </button>
+
+                                        {activeMenu === c.id && (
+                                            <>
+                                                <div className="fixed inset-0 z-10" onClick={() => setActiveMenu(null)} />
+                                                <div className="absolute left-0 top-full mt-1 w-28 z-20 overflow-hidden rounded-xl bg-white dark:bg-[#1c2237] border border-black/10 dark:border-white/10 shadow-xl animate-in fade-in zoom-in-95">
+                                                    <button 
+                                                        onClick={() => setReportingCommentId(c.id)}
+                                                        className="flex items-center gap-2 w-full px-4 py-3 text-[12px] hover:bg-red-500/10 text-red-500 transition-colors font-bold"
+                                                    >
+                                                        <ShieldAlert className="w-4 h-4" /> ریپورت
+                                                    </button>
+                                                </div>
+                                            </>
+                                        )}
+                                    </div>
+                                </div>
+                                <p className="mt-1.5 text-[13px] leading-6 opacity-80 dark:text-slate-300">{c.text}</p>
+                                <span className="mt-2 block text-[10px] opacity-40 italic font-medium">{c.createdAt}</span>
                             </div>
                         </div>
-                    </div>
-                ))}
+                    ))
+                )}
             </div>
 
-            <div
-                className="px-5 py-4 border-t"
-                style={{ borderColor: "var(--border-soft)" }}
-            >
-                <div className="flex items-end gap-3">
+            <div className="px-6 py-6 border-t border-white/5 shrink-0">
+                <div className="flex items-end gap-3 bg-black/5 dark:bg-white/5 p-2 rounded-[20px] border border-black/5 dark:border-white/10 focus-within:border-blue-500/50 transition-all">
                     <textarea
                         value={text}
                         onChange={(e) => setText(e.target.value)}
                         placeholder="کامنت بنویس..."
-                        rows={2}
-                        className={cn(
-                            "flex-1 resize-none rounded-[14px] px-4 py-2 text-[13px]",
-                            "focus:outline-none focus:ring-1"
-                        )}
-                        style={{
-                            background:
-                                theme === "light"
-                                    ? "rgba(233,238,245,0.7)"
-                                    : "rgba(255,255,255,0.07)",
-                            border: "1px solid var(--border-medium)",
-                            color: "var(--text-primary)",
-                        }}
-                        onKeyDown={(e) => {
-                            if (e.key === "Enter" && !e.shiftKey) {
-                                e.preventDefault();
-                                handleSubmit();
-                            }
-                        }}
+                        rows={1}
+                        className="flex-1 resize-none bg-transparent px-3 py-2 text-[13px] outline-none placeholder:opacity-30 dark:text-white"
+                        onKeyDown={(e) => { if (e.key === "Enter" && !e.shiftKey) { e.preventDefault(); handleSubmit(); } }}
                     />
                     <button
-                        type="button"
                         disabled={!text.trim()}
                         onClick={handleSubmit}
-                        className="h-10 rounded-full px-5 text-[13px] font-semibold transition-opacity disabled:opacity-40"
-                        style={{
-                            background: "rgba(15,82,186,0.22)",
-                            border: "1px solid var(--border-medium)",
-                            color: "var(--text-primary)",
-                        }}
+                        className="h-10 px-6 rounded-full bg-blue-600 text-white text-[12px] font-bold transition-all hover:bg-blue-700 disabled:opacity-30"
                     >
                         ارسال
                     </button>
                 </div>
             </div>
+
+            {reportingCommentId && (
+                <div className="absolute inset-0 z-[100] flex items-center justify-center px-4 animate-in fade-in duration-300">
+                    <div 
+                        className="absolute inset-0 bg-black/60 backdrop-blur-sm" 
+                        onClick={() => setReportingCommentId(null)} 
+                    />
+                    
+                    <div className={cn(
+                        "relative w-full max-w-[290px] rounded-[32px] p-8 shadow-[0_20px_50px_rgba(0,0,0,0.5)] border text-center animate-in zoom-in-95 duration-200",
+                        "bg-white border-slate-100",
+                        "dark:bg-[#1c2237] dark:border-white/10"
+                    )}>
+                        <div className="w-16 h-16 bg-red-500/10 dark:bg-red-500/20 rounded-full flex items-center justify-center mx-auto mb-5">
+                            <AlertTriangle className="text-red-500 w-8 h-8" />
+                        </div>
+
+                        <h3 className="text-[17px] font-extrabold mb-3 text-slate-800 dark:text-white">
+                            گزارش تخلف
+                        </h3>
+                        
+                        <p className="text-[13px] leading-6 mb-8 text-slate-500 dark:text-slate-400 font-medium">
+                            آیا از گزارش این کامنت اطمینان دارید؟ 
+                            <br />
+                            این عمل قابل بازگشت نیست.
+                        </p>
+                        
+                        <div className="flex flex-col gap-3">
+                            <button 
+                                onClick={handleReportSubmit}
+                                className="w-full py-4 bg-red-500 hover:bg-red-600 text-white rounded-2xl text-[14px] font-bold transition-all active:scale-95 shadow-lg shadow-red-500/20"
+                            >
+                                بله، مطمئنم
+                            </button>
+                            
+                            <button 
+                                onClick={() => setReportingCommentId(null)}
+                                className={cn(
+                                    "w-full py-4 rounded-2xl text-[14px] font-bold transition-all active:scale-95",
+                                    "bg-slate-100 text-slate-600 hover:bg-slate-200",
+                                    "dark:bg-white/5 dark:text-slate-400 dark:hover:bg-white/10"
+                                )}
+                            >
+                                انصراف
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            )}
         </div>
     );
 }
