@@ -54,6 +54,7 @@ function mapDbItemToPost(item: DbItem): LostFoundPost {
         description: item.description,
         publisherName: "نام کاربری",
         publishedAt,
+        imageUrl: item.photoData 
     };
 }
 
@@ -67,34 +68,32 @@ export function PostsPage() {
 
     useEffect(() => {
         let cancelled = false;
-
         async function load() {
             try {
                 setLoading(true);
                 setError(null);
                 const res = await fetch(API_URL);
-                if (!res.ok)
-                    throw new Error(`API error: ${res.status} ${res.statusText}`);
+                if (!res.ok) throw new Error(`API error: ${res.status} ${res.statusText}`);
                 const data = (await res.json()) as DbItem[];
                 if (!cancelled) setItems(Array.isArray(data) ? data : []);
             } catch (e) {
-                if (!cancelled)
-                    setError(e instanceof Error ? e.message : "Unknown error");
+                if (!cancelled) setError(e instanceof Error ? e.message : "Unknown error");
             } finally {
                 if (!cancelled) setLoading(false);
             }
         }
-
         load();
         return () => { cancelled = true; };
     }, []);
 
     const posts: LostFoundPost[] = useMemo(() => items.map(mapDbItemToPost), [items]);
-
     const activePost = posts.find((p) => p.id === activePostId) ?? null;
 
     function handleComment(id: string) {
         setActivePostId((prev) => (prev === id ? null : id));
+        if (activePostId !== id) {
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+        }
     }
 
     function handleCloseComment() {
@@ -104,85 +103,34 @@ export function PostsPage() {
     const isCommentOpen = activePostId !== null;
 
     return (
-        <div dir="rtl" className="min-h-screen flex">
+        <div dir="rtl" className="min-h-screen flex bg-[var(--background)]">
 
-            <div
-                className="flex-1 overflow-y-auto overflow-x-hidden transition-all duration-500"
-                style={{ paddingLeft: isCommentOpen ? "0" : "0" }}
-            >
+            <div className="flex-1 transition-all duration-500 overflow-hidden">
                 <main className="mx-auto w-full px-6 pt-[130px] pb-16">
 
-                    {loading && (
-                        <div className="text-white text-center w-full py-10">
-                            در حال دریافت پست‌ها...
-                        </div>
-                    )}
+                    {loading && <div className="text-center w-full py-10 opacity-60">در حال دریافت پست‌ها...</div>}
+                    {!loading && error && <div className="text-center w-full py-10 text-red-400">خطا: {error}</div>}
 
-                    {!loading && error && (
-                        <div className="text-white text-center w-full py-10">
-                            خطا در دریافت داده‌ها: {error}
-                            <div className="opacity-80 mt-2 text-sm">
-                                مطمئن شو json-server روی 3001 اجراست.
-                            </div>
-                        </div>
-                    )}
-
-                    {!loading && !error && posts.length === 0 && (
-                        <div className="text-white text-center w-full py-10">
-                            موردی جهت نمایش یافت نشد.
-                        </div>
-                    )}
-
-                    {!loading && !error && posts.length > 0 && (
-                        <div
-                            className={[
-                                "grid gap-8 justify-items-center transition-all duration-500",
-                                isCommentOpen
-                                    ? "grid-cols-1"
-                                    : "sm:grid-cols-1 md:grid-cols-2 lg:grid-cols-3",
-                            ].join(" ")}
-                        >
-                            {posts.map((p) => (
+                    {!loading && !error && (
+                        <div className={`grid gap-8 justify-items-center transition-all duration-500 ${
+                            isCommentOpen ? "grid-cols-1" : "sm:grid-cols-1 md:grid-cols-2 lg:grid-cols-3"
+                        }`}>
+                            
+                            {posts
+                                .filter(p => !isCommentOpen || p.id === activePostId)
+                                .map((p) => (
                                 <div
                                     key={p.id}
-                                    className="w-full transition-all duration-500"
-                                    style={{
-
-                                        opacity:
-                                            !isCommentOpen || p.id === activePostId
-                                                ? 1
-                                                : 0.45,
-                                        transform:
-                                            p.id === activePostId
-                                                ? "scale(1.02)"
-                                                : "scale(1)",
-                                        filter:
-                                            isCommentOpen && p.id !== activePostId
-                                                ? "blur(0.5px) grayscale(30%)"
-                                                : "none",
-                                        maxWidth: isCommentOpen
-                                            ? p.id === activePostId
-                                                ? "600px"
-                                                : "520px"
-                                            : "520px",
-                                        margin: "0 auto",
-                                    }}
+                                    className="w-full max-w-[550px] animate-in fade-in zoom-in duration-300"
                                 >
                                     <PostCard
                                         post={p}
                                         onComment={handleComment}
-                                        onReport={(id) => console.log("report", id)}
-                                        onOpen={(id) => console.log("open", id)}
+                                        onReport={() => {}}
+                                        onOpen={() => {}}
                                     />
-
-                                    {p.id === activePostId && (
-                                        <div
-                                            className="mt-3 h-[2px] w-3/4 mx-auto rounded-full"
-                                            style={{
-                                                background:
-                                                    "linear-gradient(90deg, transparent, rgba(60,120,255,0.6), transparent)",
-                                            }}
-                                        />
+                                    {isCommentOpen && (
+                                        <div className="mt-8 h-[1px] w-full bg-gradient-to-r from-transparent via-blue-500/30 to-transparent" />
                                     )}
                                 </div>
                             ))}
@@ -191,56 +139,33 @@ export function PostsPage() {
                 </main>
             </div>
 
-            <div
-                className={[
-                    "hidden lg:flex flex-col shrink-0 overflow-hidden",
-                    "transition-all duration-500 ease-in-out",
-                    isCommentOpen ? "w-[420px] opacity-100" : "w-0 opacity-0 pointer-events-none",
-                ].join(" ")}
+            <aside
+                className={`hidden lg:flex flex-col shrink-0 transition-all duration-500 ease-in-out border-r border-white/5
+                    ${isCommentOpen ? "w-[450px] opacity-100" : "w-0 opacity-0 pointer-events-none"}
+                `}
                 style={{
-                    background:
-                        theme === "light"
-                            ? "rgba(244,247,251,0.97)"
-                            : "rgba(14,20,38,0.97)",
-                    backdropFilter: "blur(32px)",
-                    borderRight: "1px solid var(--border-soft)",
-                    boxShadow: isCommentOpen ? "-4px 0 40px var(--overlay)" : "none",
+                    background: theme === "light" ? "rgba(255,255,255,0.8)" : "rgba(10,14,26,0.8)",
+                    backdropFilter: "blur(40px)",
                     position: "sticky",
                     top: 0,
-                    height: "100vh",
-                    paddingTop: "80px",
+                    height: "100vh"
                 }}
             >
                 {activePost && (
-                    <CommentSection
-                        postId={activePost.id}
-                        onClose={handleCloseComment}
-                    />
-                )}
-            </div>
-
-            {activePost && (
-                <div
-                    className="lg:hidden fixed inset-0 z-50 flex flex-col overflow-y-auto"
-                    style={{
-                        background:
-                            theme === "light"
-                                ? "rgba(244,247,251,0.99)"
-                                : "rgba(14,20,38,0.99)",
-                    }}
-                >
-                    <div className="px-4 pt-24 pb-3 shrink-0">
-                        <PostCard
-                            post={activePost}
-                            onComment={handleComment}
-                            onReport={(id) => console.log("report", id)}
-                            onOpen={(id) => console.log("open", id)}
-                        />
+                    <div className="flex-1 flex flex-col pt-[100px]">
+                         <CommentSection postId={activePost.id} onClose={handleCloseComment} />
                     </div>
-                    <CommentSection
-                        postId={activePost.id}
-                        onClose={handleCloseComment}
-                    />
+                )}
+            </aside>
+
+            {isCommentOpen && (
+                <div className="lg:hidden fixed inset-0 z-[100] flex flex-col bg-[var(--background)] overflow-y-auto pt-20">
+                    <div className="p-4">
+                        <PostCard post={activePost!} onComment={handleComment} onReport={()=>{}} onOpen={()=>{}} />
+                    </div>
+                    <div className="flex-1">
+                        <CommentSection postId={activePost!.id} onClose={handleCloseComment} />
+                    </div>
                 </div>
             )}
         </div>

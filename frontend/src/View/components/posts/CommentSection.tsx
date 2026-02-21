@@ -35,7 +35,7 @@ export function CommentSection({ postId, onClose }: Props) {
     const [comments, setComments] = useState<Comment[]>(MOCK_COMMENTS);
     const [text, setText] = useState("");
 
-    const currentUser = { username: "کاربر جاری", avatarUrl: undefined };
+    const currentUser = { username: "کاربر ", avatarUrl: undefined };
 
     function handleSubmit() {
         const trimmed = text.trim();
