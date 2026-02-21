@@ -4,12 +4,17 @@ from fastapi.middleware.cors import CORSMiddleware
 from motor.motor_asyncio import AsyncIOMotorClient
 from beanie import init_beanie
 
+from src.api.routes.auth_routes import router as auth_router
 from src.api.routes.category_routes import router as category_router
 from src.api.routes.post_routes import router as post_router
+
+from src.infrastructure.database.models.user_document import UserDocument
 from src.infrastructure.database.models.category_document import CategoryDocument
 from src.infrastructure.database.models.post_document import PostDocument
+from src.infrastructure.database.models.otp_document import OTPDocument 
+from src.infrastructure.security.auth_handler import AuthHandler
 
-app = FastAPI(title="ُSharifJoo") 
+app = FastAPI(title="Lost and Found University System") 
 
 app.add_middleware(
     CORSMiddleware,
@@ -19,6 +24,7 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
+app.include_router(auth_router)
 app.include_router(category_router)
 app.include_router(post_router)
 
@@ -37,6 +43,17 @@ async def auth_db():
         ],
     )
 
+    
+    existing_user = await UserDocument.find_one(UserDocument.username == "admin")
+    if not existing_user:
+        hashed_pass = AuthHandler.hash_password("password123") 
+        admin_user = UserDocument(
+            username="admin",
+            password=hashed_pass,
+            email="admin@test.com"
+        )
+        await admin_user.insert()
+        print("Test user 'admin' created successfully.")
 
 @app.get("/")
 def read_root():

@@ -23,3 +23,5 @@ cookies.txt
 __pycache__/
 *.py[cod]
 *$py.class
+# Python bytecode
+**/__pycache__/
