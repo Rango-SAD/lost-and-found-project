@@ -89,17 +89,16 @@ export function RequestCodePage() {
   }
 
   const onSubmitCode = async (data: CodeForm) => {
-    const code = data.code?.trim()
-    if (!code || code.length < 4) return
-
-    const res = await verifyCode({ email: emailForOtp, code })
-    if (res.ok && res.tempToken) {
-      sessionStorage.setItem("registerTempToken", res.tempToken)
-      sessionStorage.setItem("registerEmail", emailForOtp)
-      setModalOpen(false)
-      navigate("/register")
-    }
-  }
+    console.log("تایید کلیک شد!");
+    const code = data.code?.trim();
+    
+    sessionStorage.setItem("registerOtpCode", code);
+    sessionStorage.setItem("registerEmail", emailForOtp);
+  
+    console.log("در حال انتقال به صفحه رجیستر...");
+    setModalOpen(false);
+    navigate("/register/complete"); 
+  };
 
   return (
     <>

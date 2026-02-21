@@ -7,7 +7,7 @@ import { GlassCard } from "../components/GlassCard"
 import { TextField } from "../components/TextField"
 import { PrimaryButton } from "../components/PrimaryButton"
 import logo from "../assets/logo.png"
-import { registerSchema, RegisterSchema } from "../../Domain/Validators/registerValidator"
+import { registerSchema, type RegisterSchema } from "../../Domain/Validators/registerValidator"
 import { authFacade } from "../../Infrastructure/Utility/authFacade"
 import { useTheme } from '../../Infrastructure/Contexts/ThemeContext';
 
@@ -55,33 +55,45 @@ export function RegisterPage() {
   const { theme, toggleTheme } = useTheme()
 
   useEffect(() => {
-    const temp = sessionStorage.getItem("registerTempToken")
-    if (!temp) navigate("/register/code")
+    const temp = sessionStorage.getItem("registerOtpCode")
+    if (!temp) navigate("/register/verify")
   }, [navigate])
+
 
   const onSubmit = async (data: RegisterSchema) => {
     setSubmitting(true)
     setSubmitError(null)
 
     try {
-      const tempToken = sessionStorage.getItem("registerTempToken")
-      if (!tempToken) {
-        navigate("/register/code")
-        return
+      const otp_code = sessionStorage.getItem("registerOtpCode"); 
+      const email = sessionStorage.getItem("registerEmail");
+
+      if (!otp_code || !email) {
+        navigate("/register/verify");
+        return;
       }
 
       await authFacade.register({
-        tempToken,
+        email,
+        otp_code,
         username: data.username,
         password: data.password,
-      })
+        confirm_password: data.confirmPassword,
+      });
 
-      sessionStorage.removeItem("registerTempToken")
-      sessionStorage.removeItem("registerEmail")
+    
+      await authFacade.login({
+        username: data.username,
+        password: data.password
+      });
 
-      navigate("/posts")  
+      sessionStorage.removeItem("registerOtpCode");
+      sessionStorage.removeItem("registerEmail");
+
+      navigate("/posts"); 
+      
     } catch (e: any) {
-      setSubmitError(e?.message ?? "خطا در ثبت نام")
+      setSubmitError(e?.message ?? "خطا در فرآیند ثبت‌نام یا ورود");
     } finally {
       setSubmitting(false)
     }

@@ -14,7 +14,7 @@ export default function App() {
   const location = useLocation();
   const navigate = useNavigate();
 
-  const authPages = ['/login', '/register', '/register/code'];
+  const authPages = ['/login', '/register/verify', '/register/complete'];
   const isAuthPage = authPages.includes(location.pathname);
 
   const handleExit = () => {
@@ -36,8 +36,8 @@ export default function App() {
 
         <Route path="/" element={<Navigate to="/login" replace />} />
         <Route path="/login" element={<LoginPage />} />
-        <Route path="/register" element={<RegisterPage />} />
-        <Route path="/register/code" element={<RequestCodePage />} />
+        <Route path="/register/complete" element={<RegisterPage />} />
+        <Route path="/register/verify" element={<RequestCodePage />} />
 
         <Route path="/newItem" element={<ItemEntryView />} />
         <Route path="/map" element={<MapView />} />

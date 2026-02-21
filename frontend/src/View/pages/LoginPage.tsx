@@ -117,14 +117,12 @@ export function LoginPage() {
               {error ? <p className="text-sm text-red-300">{error}</p> : null}
 
               <div className="pt-4 flex items-center justify-between gap-6">
-                <div className="text-sm text-right" style={{ color: "var(--text-secondary)" }}>
-                   حساب کاربری ندارید؟{" "}
-                   <button
-                       type="button"
-                       onClick={() => navigate("/register/code")}
-                       style={{ color: "var(--text-primary)" }}
-                       className="underline underline-offset-4 hover:opacity-80"
-                  >
+                <div className="text-sm text-white/55 text-right">
+                  حساب کاربری ندارید؟{" "}
+                  <button
+                    type="button"
+                    onClick={() => navigate("/register/verify")}
+                    className="text-white/80 underline underline-offset-4 decoration-white/40 hover:decoration-white/70 hover:text-white"                  >
 
                     ثبت نام کنید
                   </button>
