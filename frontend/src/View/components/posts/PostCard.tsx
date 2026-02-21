@@ -1,12 +1,12 @@
 import {useState} from "react";
 import {useToast} from "../ui/ToastProvider.tsx";
 import { cn } from "../../../Infrastructure/Utility/cn";
-import { GlassSurface } from "../ui/GlassSurface";
 import { CategoryBadge } from "./CategoryBadge";
 import type { LostFoundPost } from "../../../Domain/Entities/LostFoundPost";
+import { useTheme } from "../../../Infrastructure/Contexts/ThemeContext";
 
 function typeTitleFa(type: LostFoundPost["type"]) {
-    return type === "LOST" ? "گمشده" : "پیدا شده";
+    return type === "LOST" ? "گم‌شده" : "پیدا شده";
 }
 
 type Props = {
@@ -20,37 +20,50 @@ export function PostCard({ post, onContact, onReport, onOpen }: Props) {
     const [reportOpen, setReportOpen] = useState(false);
     const [contactOpen, setContactOpen] = useState(false);
     const [message, setMessage] = useState("");
+    const { theme } = useTheme();
 
     const toast = useToast();
     return (
         <>
-        <GlassSurface
+        <div
             dir="rtl"
             className={cn(
-                "group w-full max-w-[520px] rounded-[34px]",
-                // base border (unchanged)
-                "border border-[rgba(160,177,225,0.10)]",
-                // base shadow (unchanged)
-                "shadow-[0_20px_60px_rgba(0,0,0,0.35)]",
-                "transition-all duration-200",
-                // HOVER: very visible light border + strong glow
-                "hover:border-[rgba(255,255,255,0.55)]",
-                "hover:shadow-[0_0_0_1px_rgba(255,255,255,0.20),0_28px_85px_rgba(0,0,0,0.55),0_0_36px_rgba(232,236,255,0.35)]"
+                "group relative w-full max-w-[520px] rounded-[34px] overflow-hidden",
+                "border transition-all duration-200"
             )}
-
+            style={{
+                background: theme === "light" 
+                    ? "rgba(244, 247, 251, 0.85)" 
+                    : "rgba(18, 24, 43, 0.85)",
+                backdropFilter: "blur(28px)",
+                borderColor: "var(--border-soft)",
+                boxShadow: "0 20px 60px var(--overlay)"
+            }}
+            onMouseEnter={(e) => {
+                e.currentTarget.style.borderColor = theme === "light" 
+                    ? "rgba(60,100,180,0.55)" 
+                    : "rgba(255,255,255,0.55)";
+                e.currentTarget.style.boxShadow = "0 0 0 1px rgba(255,255,255,0.20), 0 28px 85px rgba(0,0,0,0.55), 0 0 36px rgba(232,236,255,0.35)";
+            }}
+            onMouseLeave={(e) => {
+                e.currentTarget.style.borderColor = "var(--border-soft)";
+                e.currentTarget.style.boxShadow = "0 20px 60px var(--overlay)";
+            }}
             onClick={!reportOpen && onOpen ? () => onOpen(post.id) : undefined}
             role={onOpen ? "button" : undefined}
             tabIndex={onOpen ? 0 : undefined}
         >
-            <div className="px-7 pt-6 pb-5">
-                {/* Title */}
-                <div className="text-center text-[15px] font-semibold text-[#aab0d6]">
+            <div className="pointer-events-none absolute inset-0">
+                <div className="absolute -top-24 -left-24 h-64 w-64 rounded-full bg-purple-500/10 blur-3xl" />
+                <div className="absolute -bottom-28 -right-24 h-72 w-72 rounded-full bg-sky-500/10 blur-3xl" />
+            </div>
+
+            <div className="relative px-7 pt-6 pb-5">
+                <div className="text-center text-[15px] font-semibold" style={{ color: "var(--text-secondary)" }}>
                     {typeTitleFa(post.type)}
                 </div>
 
-                {/* Top row: badge (left) + image (right) + meta (center-left) */}
                 <div className="mt-5 grid grid-cols-[1fr_180px] gap-5">
-                    {/* Left column: badge + meta */}
                     <div className="min-w-0">
                         <div className="flex justify-start">
                             <CategoryBadge category={post.category} />
@@ -58,36 +71,39 @@ export function PostCard({ post, onContact, onReport, onOpen }: Props) {
 
                         <div className="mt-4 space-y-3 text-right text-[14px]">
                             <div className="truncate">
-                                <span className="text-[#6f76a8]">نام آیتم</span>
-                                <span className="mx-2 text-white/15">|</span>
-                                <span className="text-[#e8ecff]">{post.itemName}</span>
+                                <span style={{ color: "var(--text-muted)" }}>نام آیتم</span>
+                                <span className="mx-2" style={{ color: "var(--divider)" }}>|</span>
+                                <span style={{ color: "var(--text-primary)" }}>{post.itemName}</span>
                             </div>
 
                             <div className="truncate">
-                                <span className="text-[#6f76a8]">#تگ</span>
-                                <span className="mx-2 text-white/15">|</span>
-                                <span className="text-[#e8ecff]">{post.tag ?? "—"}</span>
+                                <span style={{ color: "var(--text-muted)" }}>#تگ</span>
+                                <span className="mx-2" style={{ color: "var(--divider)" }}>|</span>
+                                <span style={{ color: "var(--text-primary)" }}>{post.tag ?? "—"}</span>
                             </div>
 
                             <div className="truncate">
-                                <span className="text-[#6f76a8]">لوکیشن</span>
-                                <span className="mx-2 text-white/15">|</span>
-                                <span className="text-[#e8ecff]">{post.location}</span>
+                                <span style={{ color: "var(--text-muted)" }}>لوکیشن</span>
+                                <span className="mx-2" style={{ color: "var(--divider)" }}>|</span>
+                                <span style={{ color: "var(--text-primary)" }}>{post.location}</span>
                             </div>
                         </div>
                     </div>
 
-                    {/* Right column: image */}
                     <div
                         className={cn(
-                            "relative h-[120px] w-[180px] overflow-hidden rounded-[26px]",
-                            "bg-white/6 ring-1 ring-white/10",
-                            "shadow-[inset_0_0_0_1px_rgba(255,255,255,0.06)]"
+                            "relative h-[120px] w-[180px] overflow-hidden rounded-[26px] ring-1"
                         )}
+                        style={{
+                            background: "var(--surface-2)",
+                            borderColor: "var(--border-soft)"
+                        }}
                     >
                         <div className="pointer-events-none absolute inset-0">
-                            <div className="absolute -top-10 -left-10 h-40 w-40 rounded-full bg-white/10 blur-2xl" />
-                            <div className="absolute -bottom-10 -right-10 h-40 w-40 rounded-full bg-white/8 blur-2xl" />
+                            <div className="absolute -top-10 -left-10 h-40 w-40 rounded-full blur-2xl" 
+                                style={{ background: "var(--surface-3)" }} />
+                            <div className="absolute -bottom-10 -right-10 h-40 w-40 rounded-full blur-2xl" 
+                                style={{ background: "var(--surface-2)" }} />
                         </div>
 
                         {post.imageUrl ? (
@@ -97,7 +113,7 @@ export function PostCard({ post, onContact, onReport, onOpen }: Props) {
                                 className="h-full w-full object-cover"
                             />
                         ) : (
-                            <div className="grid h-full w-full place-items-center text-white/35">
+                            <div className="grid h-full w-full place-items-center" style={{ color: "var(--text-muted)" }}>
                                 <svg width="52" height="52" viewBox="0 0 24 24" fill="none" aria-hidden="true">
                                     <path
                                         d="M4 7a3 3 0 0 1 3-3h10a3 3 0 0 1 3 3v10a3 3 0 0 1-3 3H7a3 3 0 0 1-3-3V7Z"
@@ -123,32 +139,31 @@ export function PostCard({ post, onContact, onReport, onOpen }: Props) {
                     </div>
                 </div>
 
-                {/* Divider */}
-                <div className="mt-6 h-px w-full bg-white/10" />
-
-                {/* Bottom row: description (left) + profile (right) */}
+                <div className="mt-6 h-px w-full" style={{ background: "var(--divider)" }} />
                 <div className="mt-5 grid grid-cols-[1fr_210px] gap-5">
-                    {/* Description */}
                     <div className="min-w-0 text-right">
-                        <div className="text-[13px] leading-7 text-[#aab0d6]">
+                        <div className="text-[13px] leading-7" style={{ color: "var(--text-secondary)" }}>
                             {post.description ?? "متن نمونه توضیحات..."}
                         </div>
                     </div>
 
-                    {/* Profile */}
                     <div className="flex items-start justify-end gap-3">
                         <div className="text-right leading-5">
-                            <div className="text-[14px] font-semibold text-[#e8ecff]">
+                            <div className="text-[14px] font-semibold" style={{ color: "var(--text-primary)" }}>
                                 {post.publisherName ?? "نام کاربری"}
                             </div>
-                            <div className="mt-2 text-[12px] text-[#6f76a8]">
+                            <div className="mt-2 text-[12px]" style={{ color: "var(--text-muted)" }}>
                                 زمان انتشار
-                                <span className="mx-2 text-white/15">|</span>
-                                <span className="text-[#aab0d6]">{post.publishedAt ?? "—"}</span>
+                                <span className="mx-2" style={{ color: "var(--divider)" }}>|</span>
+                                <span style={{ color: "var(--text-secondary)" }}>{post.publishedAt ?? "—"}</span>
                             </div>
                         </div>
 
-                        <div className="grid h-10 w-10 place-items-center rounded-full bg-white/6 ring-1 ring-white/10">
+                        <div className="grid h-10 w-10 place-items-center rounded-full ring-1"
+                            style={{
+                                background: "var(--surface-2)",
+                                borderColor: "var(--border-soft)"
+                            }}>
                             <svg width="18" height="18" viewBox="0 0 24 24" fill="none" aria-hidden="true">
                                 <path
                                     d="M12 12a4 4 0 1 0-4-4 4 4 0 0 0 4 4Z"
@@ -167,9 +182,7 @@ export function PostCard({ post, onContact, onReport, onOpen }: Props) {
                     </div>
                 </div>
 
-                {/* Buttons row */}
-                <div className="mt-6 flex items-center justify-between gap-4">
-                    {/* Contact */}
+                <div className="mt-6 flex items-center gap-3">
                     <button
                         type="button"
                         onClick={(e) => {
@@ -177,21 +190,17 @@ export function PostCard({ post, onContact, onReport, onOpen }: Props) {
                             setContactOpen(true);
                         }}
                         className={cn(
-                            "h-[47px] flex-1 rounded-full px-6 text-[14px] font-semibold",
-                            "transition-all duration-200",
-                            // fill: #0F52BA 15%
-                            "bg-[rgba(15,82,186,0.15)]",
-                            // stroke: white 14%
-                            "ring-1 ring-[rgba(255,255,255,0.14)]",
-                            "text-[#e8ecff]",
-                            // hover
-                            "hover:bg-[rgba(15,82,186,0.22)] hover:ring-[rgba(255,255,255,0.20)]"
+                            "h-11 flex-1 rounded-full px-6 text-[14px] font-semibold transition-all"
                         )}
+                        style={{
+                            background: "rgba(15,82,186,0.18)",
+                            border: "1px solid var(--border-medium)",
+                            color: "var(--text-primary)"
+                        }}
                     >
-                        ارتباط با صاحب
+                        تماس
                     </button>
 
-                    {/* Report */}
                     <button
                         type="button"
                         onClick={(e) => {
@@ -199,171 +208,186 @@ export function PostCard({ post, onContact, onReport, onOpen }: Props) {
                             setReportOpen(true);
                         }}
                         className={cn(
-                            "h-[47px] flex-1 rounded-full px-6 text-[14px] font-semibold",
-                            "transition-all duration-200",
-                            // fill: #B83A2D 15%
-                            "bg-[rgba(184,58,45,0.15)]",
-                            // stroke: white 14%
-                            "ring-1 ring-[rgba(255,255,255,0.14)]",
-                            "text-[#e8ecff]",
-                            // hover
-                            "hover:bg-[rgba(184,58,45,0.22)] hover:ring-[rgba(255,255,255,0.20)]"
+                            "h-11 flex-1 rounded-full px-6 text-[14px] font-semibold transition-all"
                         )}
+                        style={{
+                            background: "rgba(184,58,45,0.18)",
+                            border: "1px solid var(--border-medium)",
+                            color: "var(--text-primary)"
+                        }}
                     >
                         ریپورت
                     </button>
                 </div>
             </div>
-        </GlassSurface>
-
-    {/* Report confirmation modal */}
-    {reportOpen ? (
-        <div
-            className="fixed inset-0 z-[999] flex items-center justify-center px-4"
-            onClick={() => setReportOpen(false)}
-        >
-            <div className="absolute inset-0 bg-black/55 backdrop-blur-sm" />
-
-            <div
-                className={cn(
-                    "relative w-full max-w-[420px] rounded-[26px]",
-                    "border border-[rgba(160,177,225,0.14)]",
-                    "bg-white/10 backdrop-blur-2xl",
-                    "ring-1 ring-white/10",
-                    "shadow-[0_25px_80px_rgba(0,0,0,0.55)]",
-                    "p-6"
-                )}
-                onClick={(e) => e.stopPropagation()}
-                role="dialog"
-                aria-modal="true"
-            >
-                <div className="text-right text-[14px] font-semibold text-[#e8ecff]">
-                    آیا از ریپورت این آگهی مطمئن هستید؟
-                </div>
-                <div className="mt-2 text-right text-[13px] text-[#aab0d6]">
-                    این اقدام برای بررسی محتوا ثبت می‌شود.
-                </div>
-
-                <div className="mt-6 flex items-center justify-between gap-3">
-                    <button
-                        type="button"
-                        className={cn(
-                            "h-11 flex-1 rounded-full px-6 text-[14px] font-semibold",
-                            "bg-[rgba(15,82,186,0.18)] text-[#e8ecff]",
-                            "ring-1 ring-[rgba(255,255,255,0.14)]",
-                            "hover:bg-[rgba(15,82,186,0.26)] hover:ring-[rgba(255,255,255,0.20)]"
-                        )}
-                        onClick={() => setReportOpen(false)}
-                    >
-                        خیر
-                    </button>
-
-                    <button
-                        type="button"
-                        className={cn(
-                            "h-11 flex-1 rounded-full px-6 text-[14px] font-semibold",
-                            "bg-[rgba(184,58,45,0.18)] text-[#e8ecff]",
-                            "ring-1 ring-[rgba(255,255,255,0.14)]",
-                            "hover:bg-[rgba(184,58,45,0.26)] hover:ring-[rgba(255,255,255,0.20)]"
-                        )}
-                        onClick={() => {
-                            setReportOpen(false);
-                            onReport?.(post.id);
-                            toast.push("ریپورت شما ثبت شد")
-                        }}
-                    >
-                        بله
-                    </button>
-                </div>
-            </div>
         </div>
-    ) : null}
-            {/* Contact modal */}
-            {contactOpen ? (
+
+        {reportOpen ? (
+            <div
+                className="fixed inset-0 z-[999] flex items-center justify-center px-4"
+                onClick={() => setReportOpen(false)}
+            >
+                <div className="absolute inset-0 backdrop-blur-sm" style={{ background: "var(--overlay)" }} />
+
                 <div
-                    className="fixed inset-0 z-[999] flex items-center justify-center px-4"
-                    onClick={() => setContactOpen(false)}
+                    className={cn(
+                        "relative w-full max-w-[420px] rounded-[26px] p-6"
+                    )}
+                    style={{
+                        background: theme === "light" 
+                            ? "rgba(244, 247, 251, 0.92)" 
+                            : "rgba(18, 24, 43, 0.92)",
+                        backdropFilter: "blur(24px)",
+                        border: "1px solid var(--border-medium)",
+                        boxShadow: "0 25px 80px var(--overlay)"
+                    }}
+                    onClick={(e) => e.stopPropagation()}
+                    role="dialog"
+                    aria-modal="true"
                 >
-                    <div className="absolute inset-0 bg-black/55 backdrop-blur-sm" />
+                    <div className="text-right text-[14px] font-semibold" style={{ color: "var(--text-primary)" }}>
+                        آیا از ریپورت این آگهی مطمئن هستید؟
+                    </div>
+                    <div className="mt-2 text-right text-[13px]" style={{ color: "var(--text-secondary)" }}>
+                        این اقدام برای بررسی محتوا ثبت می‌شود.
+                    </div>
 
-                    <div
-                        className={cn(
-                            "relative w-full max-w-[440px] rounded-[26px]",
-                            "border border-[rgba(160,177,225,0.14)]",
-                            "bg-white/10 backdrop-blur-2xl",
-                            "ring-1 ring-white/10",
-                            "shadow-[0_25px_80px_rgba(0,0,0,0.55)]",
-                            "p-6"
-                        )}
-                        onClick={(e) => e.stopPropagation()}
-                        role="dialog"
-                        aria-modal="true"
-                    >
-                        {/* Title */}
-                        <div className="text-right text-[14px] font-semibold text-[#e8ecff]">
-                            ارسال پیام
-                        </div>
-
-                        {/* Textarea */}
-                        <textarea
-                            value={message}
-                            onChange={(e) => setMessage(e.target.value)}
-                            placeholder="متن پیام"
+                    <div className="mt-6 flex items-center justify-between gap-3">
+                        <button
+                            type="button"
                             className={cn(
-                                "mt-4 w-full resize-none rounded-[18px] px-4 py-3",
-                                "bg-white/8 backdrop-blur-xl",
-                                "border border-[rgba(160,177,225,0.14)]",
-                                "ring-1 ring-white/10",
-                                "text-[13px] text-[#e8ecff]",
-                                "placeholder:text-[#6f76a8]",
-                                "focus:outline-none focus:ring-2 focus:ring-white/20"
+                                "h-11 flex-1 rounded-full px-6 text-[14px] font-semibold"
                             )}
-                            rows={4}
-                        />
+                            style={{
+                                background: "rgba(15,82,186,0.18)",
+                                border: "1px solid var(--border-medium)",
+                                color: "var(--text-primary)"
+                            }}
+                            onClick={() => setReportOpen(false)}
+                        >
+                            خیر
+                        </button>
 
-                        {/* Buttons */}
-                        <div className="mt-6 flex items-center justify-between gap-3">
-                            {/* Send */}
-                            <button
-                                type="button"
-                                disabled={!message.trim()}
-                                className={cn(
-                                    "h-11 flex-1 rounded-full px-6 text-[14px] font-semibold",
-                                    "transition-all",
-                                    message.trim()
-                                        ? "bg-[rgba(15,82,186,0.18)] text-[#e8ecff] ring-1 ring-[rgba(255,255,255,0.18)] hover:bg-[rgba(15,82,186,0.26)]"
-                                        : "bg-white/6 text-[#6f76a8] ring-1 ring-white/10 cursor-not-allowed"
-                                )}
-                                onClick={() => {
-                                    onContact?.(post.id, message.trim());
-                                    setContactOpen(false);
-                                    setMessage("");
-                                    toast.push("پیام شما ارسال شد");
-                                }}
-                            >
-                                ارسال
-                            </button>
-
-                            {/* Cancel */}
-                            <button
-                                type="button"
-                                className={cn(
-                                    "h-11 flex-1 rounded-full px-6 text-[14px] font-semibold",
-                                    "bg-[rgba(184,58,45,0.18)] text-[#e8ecff]",
-                                    "ring-1 ring-[rgba(255,255,255,0.14)]",
-                                    "hover:bg-[rgba(184,58,45,0.26)] hover:ring-[rgba(255,255,255,0.20)]"
-                                )}
-                                onClick={() => {
-                                    setContactOpen(false);
-                                    setMessage("");
-                                }}
-                            >
-                                انصراف
-                            </button>
-                        </div>
+                        <button
+                            type="button"
+                            className={cn(
+                                "h-11 flex-1 rounded-full px-6 text-[14px] font-semibold"
+                            )}
+                            style={{
+                                background: "rgba(184,58,45,0.18)",
+                                border: "1px solid var(--border-medium)",
+                                color: "var(--text-primary)"
+                            }}
+                            onClick={() => {
+                                setReportOpen(false);
+                                onReport?.(post.id);
+                                toast.push("ریپورت شما ثبت شد")
+                            }}
+                        >
+                            بله
+                        </button>
                     </div>
                 </div>
-            ) : null}
+            </div>
+        ) : null}
+
+        {contactOpen ? (
+            <div
+                className="fixed inset-0 z-[999] flex items-center justify-center px-4"
+                onClick={() => setContactOpen(false)}
+            >
+                <div className="absolute inset-0 backdrop-blur-sm" style={{ background: "var(--overlay)" }} />
+
+                <div
+                    className={cn(
+                        "relative w-full max-w-[440px] rounded-[26px] p-6"
+                    )}
+                    style={{
+                        background: theme === "light" 
+                            ? "rgba(244, 247, 251, 0.92)" 
+                            : "rgba(18, 24, 43, 0.92)",
+                        backdropFilter: "blur(24px)",
+                        border: "1px solid var(--border-medium)",
+                        boxShadow: "0 25px 80px var(--overlay)"
+                    }}
+                    onClick={(e) => e.stopPropagation()}
+                    role="dialog"
+                    aria-modal="true"
+                >
+                    <div className="text-right text-[14px] font-semibold" style={{ color: "var(--text-primary)" }}>
+                        ارسال پیام
+                    </div>
+
+                    <textarea
+                        value={message}
+                        onChange={(e) => setMessage(e.target.value)}
+                        placeholder="متن پیام"
+                        className={cn(
+                            "mt-4 w-full resize-none rounded-[18px] px-4 py-3 text-[13px]",
+                            "focus:outline-none focus:ring-2 placeholder-opacity-70"
+                        )}
+                        style={{
+                            background: theme === "light" 
+                                ? "rgba(233, 238, 245, 0.6)" 
+                                : "rgba(255,255,255,0.08)",
+                            border: "1px solid var(--border-medium)",
+                            color: "var(--text-primary)"
+                        }}
+                        rows={4}
+                    />
+
+                    <div className="mt-6 flex items-center justify-between gap-3">
+                        <button
+                            type="button"
+                            disabled={!message.trim()}
+                            className={cn(
+                                "h-11 flex-1 rounded-full px-6 text-[14px] font-semibold transition-all"
+                            )}
+                            style={
+                                message.trim()
+                                    ? {
+                                        background: "rgba(15,82,186,0.18)",
+                                        border: "1px solid var(--border-medium)",
+                                        color: "var(--text-primary)"
+                                      }
+                                    : {
+                                        background: "var(--surface-2)",
+                                        border: "1px solid var(--border-soft)",
+                                        color: "var(--text-muted)",
+                                        cursor: "not-allowed"
+                                      }
+                            }
+                            onClick={() => {
+                                onContact?.(post.id, message.trim());
+                                setContactOpen(false);
+                                setMessage("");
+                                toast.push("پیام شما ارسال شد");
+                            }}
+                        >
+                            ارسال
+                        </button>
+
+                        <button
+                            type="button"
+                            className={cn(
+                                "h-11 flex-1 rounded-full px-6 text-[14px] font-semibold"
+                            )}
+                            style={{
+                                background: "rgba(184,58,45,0.18)",
+                                border: "1px solid var(--border-medium)",
+                                color: "var(--text-primary)"
+                            }}
+                            onClick={() => {
+                                setContactOpen(false);
+                                setMessage("");
+                            }}
+                        >
+                            انصراف
+                        </button>
+                    </div>
+                </div>
+            </div>
+        ) : null}
 
         </>
     );

@@ -3,6 +3,7 @@ import { useNavigate } from "react-router-dom";
 import UniversityMap from "../../components/map/UniversityMap";
 import "./ItemEntryStyle.css";
 import "../MapView/MapViewStyle.css";
+import { useLocation } from "react-router-dom";
 
 function ItemEntryView() {
   const navigate = useNavigate();
@@ -15,6 +16,15 @@ function ItemEntryView() {
   const [photoPreview, setPhotoPreview] = useState<string>("");
   const [showError, setShowError] = useState(false);
   const [errorMessage, setErrorMessage] = useState("");
+  const location = useLocation();
+  const [selectedPos, setSelectedPos] = useState<{lat: number, lng: number} | null>(null);
+
+  useEffect(() => {
+    if (location.state?.selectedLocation) {
+        setSelectedPos(location.state.selectedLocation);
+    }
+}, [location.state]);
+
 
   const toggleStatus = () => {
     setIsFound(!isFound);
@@ -41,26 +51,16 @@ function ItemEntryView() {
       setTimeout(() => setShowError(false), 3000);
       return;
     }
-    if (!tag.trim()) {
-      setErrorMessage("لطفاً تگ را وارد کنید");
-      setShowError(true);
-      setTimeout(() => setShowError(false), 3000);
-      return;
-    }
+
     if (!category) {
       setErrorMessage("لطفاً دسته‌بندی را انتخاب کنید");
       setShowError(true);
       setTimeout(() => setShowError(false), 3000);
       return;
     }
-    if (!description.trim()) {
-      setErrorMessage("لطفاً توضیحات را وارد کنید");
-      setShowError(true);
-      setTimeout(() => setShowError(false), 3000);
-      return;
-    }
+
     if (!photo) {
-      setErrorMessage("لطفاً عکس را آپلود کنید");
+      setErrorMessage("لطفاً عکس آپلود کنید");
       setShowError(true);
       setTimeout(() => setShowError(false), 3000);
       return;
@@ -74,6 +74,7 @@ function ItemEntryView() {
       status: isFound ? "پیدا شده" : "گم شده",
       photoName: photo.name,
       photoData: photoPreview, 
+      location: selectedPos,
       date: new Date().toLocaleDateString('fa-IR'),
       timestamp: new Date().toISOString()
     };
@@ -203,12 +204,27 @@ function ItemEntryView() {
             <div className="h-full w-full opacity-60 group-hover:opacity-100 transition-opacity">
               <UniversityMap />
             </div>
-            <div className="absolute inset-0 flex items-center justify-center bg-black/20 opacity-0 group-hover:opacity-100 transition-all">
-               <span className="px-4 py-2 bg-white/10 backdrop-blur-md rounded-full border border-white/20 text-[10px] text-white">مشاهده نقشه کامل</span>
+            <div 
+              className="absolute inset-0 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-all"
+              style={{ background: "var(--overlay)" }}
+            >
+              <span 
+                className="px-4 py-2 backdrop-blur-md rounded-full text-[10px]"
+                style={{
+                  background: "var(--surface-2)",
+                  border: "1px solid var(--border-soft)",
+                  color: "var(--text-primary)"
+                }}
+              >
+                مشاهده نقشه کامل
+              </span>
             </div>
           </div>
           
-          <div className="neon-input-card flex flex-col items-center justify-center p-14 border-dashed border-white/10 relative cursor-pointer hover:border-white/30 transition-all">
+          <div 
+            className="neon-input-card flex flex-col items-center justify-center p-14 border-dashed relative cursor-pointer hover:border-white/30 transition-all"
+            style={{ borderColor: "var(--border-soft)" }}
+          >
             <input 
               type="file" 
               accept="image/*"
@@ -222,8 +238,13 @@ function ItemEntryView() {
               </>
             ) : (
               <>
-                <div className="text-white/20 text-4xl mb-2">📷</div>
-                <span className="text-white/30 text-[10px] uppercase tracking-widest">Upload Photo</span>
+                <div className="text-4xl mb-2" style={{ color: "var(--text-muted)", opacity: 0.3 }}>📷</div>
+                <span 
+                  className="text-[10px] uppercase tracking-widest"
+                  style={{ color: "var(--text-muted)", opacity: 0.5 }}
+                >
+                  Upload Photo
+                </span>
               </>
             )}
           </div>

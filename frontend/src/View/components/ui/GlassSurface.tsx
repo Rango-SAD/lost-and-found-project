@@ -16,13 +16,11 @@ export function GlassSurface({ className, edgeClassName, ...props }: Props) {
                 className
             )}
         >
-            {/* subtle highlight layer */}
             <div className="pointer-events-none absolute inset-0">
                 <div className="absolute -top-24 -left-24 h-64 w-64 rounded-full bg-white/10 blur-3xl" />
                 <div className="absolute -bottom-24 -right-24 h-64 w-64 rounded-full bg-white/8 blur-3xl" />
             </div>
 
-            {/* edge stroke overlay */}
             <div
                 className={cn(
                     "pointer-events-none absolute inset-0 rounded-[inherit]",

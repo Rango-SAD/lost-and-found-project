@@ -9,25 +9,33 @@ type Props = InputHTMLAttributes<HTMLInputElement> & {
 export function TextField({ label, error, endIcon, className = "", ...rest }: Props) {
   return (
     <div className="space-y-2">
-      {label ? <label className="block text-sm text-white/70">{label}</label> : null}
+      {label ? (
+        <label className="block text-sm" style={{ color: "var(--text-secondary)" }}>
+          {label}
+        </label>
+      ) : null}
 
       <div
         className={[
           "flex items-center gap-4 rounded-full px-8 py-7",
-          "bg-[rgba(10,14,24,0.35)]",
-          "border border-white/10",
           "backdrop-blur-[18px]",
-          "shadow-[inset_0_1px_0_rgba(255,255,255,0.08)]",
           "transition",
-          "focus-within:border-white/20 focus-within:bg-[rgba(10,14,24,0.45)]",
           className,
         ].join(" ")}
+        style={{
+          background: "var(--surface-2)",
+          border: "1px solid var(--border-soft)",
+          boxShadow: "inset 0 1px 0 rgba(255,255,255,0.08)"
+        }}
       >
         <input
           {...rest}
-          className="w-full bg-transparent text-white/90 placeholder:text-white/35 outline-none"
+          className="w-full bg-transparent outline-none"
+          style={{ color: "var(--text-primary)" }}
         />
-        {endIcon ? <div className="text-white/40">{endIcon}</div> : null}
+        {endIcon ? (
+          <div style={{ color: "var(--text-muted)" }}>{endIcon}</div>
+        ) : null}
       </div>
 
       {error ? <p className="text-xs text-red-300">{error}</p> : null}
