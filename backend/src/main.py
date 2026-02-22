@@ -2,15 +2,17 @@ import os
 from contextlib import asynccontextmanager
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware 
+from fastapi.responses import RedirectResponse 
 from motor.motor_asyncio import AsyncIOMotorClient
 from beanie import init_beanie
 
+# Routes
 from src.api.routes.auth_routes import router as auth_router
 from src.api.routes.category_routes import router as category_router
 from src.api.routes.post_routes import router as post_router
 from src.api.routes.interaction_routes import router as interaction_router 
 
-
+# Models
 from src.infrastructure.database.models.user_document import UserDocument
 from src.infrastructure.database.models.category_document import CategoryDocument
 from src.infrastructure.database.models.post_document import PostDocument
@@ -67,6 +69,6 @@ app.include_router(category_router)
 app.include_router(post_router)
 app.include_router(interaction_router) 
 
-@app.get("/")
-def read_root():
-    return {"message": "Welcome to Lost and Found API"}
+@app.get("/", include_in_schema=False)
+async def read_root():
+    return RedirectResponse(url="/posts/all")
