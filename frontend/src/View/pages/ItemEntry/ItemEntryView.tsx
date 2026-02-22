@@ -66,28 +66,25 @@ function ItemEntryView() {
       return;
     }
 
-    const itemData = {
-      itemName,
-      tag,
-      category,
-      description,
-      status: isFound ? "پیدا شده" : "گم شده",
-      photoName: photo.name,
-      photoData: photoPreview, 
-      location: selectedPos,
-      date: new Date().toLocaleDateString('fa-IR'),
-      timestamp: new Date().toISOString()
+  const body = {
+    type: isFound ? "found" : "lost",
+    title: itemName,
+    category_key: category,
+    tag: tag || "",
+    description: description || "",
+    publisher_username: "admin",
+    location: selectedPos
+      ? { type: "Point", coordinates: [selectedPos.lng, selectedPos.lat] }
+      : { type: "Point", coordinates: [51.3515, 35.7036] },
+    image_url: null,
     };
 
-    try {
-  
-      const response = await fetch('http://localhost:3001/lostAndFoundItems', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify(itemData)
-      });
+  try {
+    const response = await fetch("http://localhost:8000/posts/add", {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify(body),
+  });
 
       if (response.ok) {
         const savedItem = await response.json();
