@@ -8,11 +8,16 @@ from beanie import init_beanie
 from src.api.routes.auth_routes import router as auth_router
 from src.api.routes.category_routes import router as category_router
 from src.api.routes.post_routes import router as post_router
+from src.api.routes.interaction_routes import router as interaction_router 
+
 
 from src.infrastructure.database.models.user_document import UserDocument
 from src.infrastructure.database.models.category_document import CategoryDocument
 from src.infrastructure.database.models.post_document import PostDocument
 from src.infrastructure.database.models.otp_document import OTPDocument 
+from src.infrastructure.database.models.comment_document import CommentDocument 
+from src.infrastructure.database.models.report_document import ReportDocument 
+
 from src.infrastructure.security.auth_handler import AuthHandler
 
 @asynccontextmanager
@@ -28,6 +33,8 @@ async def lifespan(app: FastAPI):
             OTPDocument,
             CategoryDocument,
             PostDocument,
+            CommentDocument, 
+            ReportDocument   
         ],
     )
 
@@ -58,6 +65,7 @@ app.add_middleware(
 app.include_router(auth_router)
 app.include_router(category_router)
 app.include_router(post_router)
+app.include_router(interaction_router) 
 
 @app.get("/")
 def read_root():
