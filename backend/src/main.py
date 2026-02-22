@@ -9,6 +9,7 @@ from src.api.routes.auth_routes import router as auth_router
 from src.api.routes.category_routes import router as category_router
 from src.api.routes.post_routes import router as post_router
 from src.api.routes.interaction_routes import router as interaction_router 
+from src.api.routes.map_routes import router as map_router  
 
 
 from src.infrastructure.database.models.user_document import UserDocument
@@ -66,6 +67,7 @@ app.include_router(auth_router)
 app.include_router(category_router)
 app.include_router(post_router)
 app.include_router(interaction_router) 
+app.include_router(map_router) 
 
 @app.get("/")
 def read_root():

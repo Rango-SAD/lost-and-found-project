@@ -2,7 +2,7 @@ import { useEffect, useState } from 'react';
 import type { RawItem } from '../../Domain/Types/mapTypes';
 
 
-const API_URL = 'http://localhost:3001/lostAndFoundItems';
+const API_URL = 'http://localhost:8000/lostAndFoundItems';
 
 interface UseMapItemsResult {
     items: RawItem[];
