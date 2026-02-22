@@ -6,6 +6,8 @@ from src.application.use_cases.get_posts_by_publisher import GetPostsByPublisher
 from src.application.use_cases.get_posts_by_category import GetPostsByCategoryUseCase
 from src.application.use_cases.update_post import UpdatePostUseCase
 from src.application.use_cases.delete_post import DeletePostUseCase
+from src.application.use_cases.search_posts import SearchPostsUseCase
+from src.application.use_cases.get_posts_by_tag import GetPostsByTagUseCase
 from src.infrastructure.repositories.mongo_post_repository import MongoPostRepository
 from src.infrastructure.security.auth_handler import AuthHandler
 
@@ -48,3 +50,15 @@ async def delete_post(post_id: str, current_user: str = Depends(AuthHandler.get_
     use_case = DeletePostUseCase(post_repo)
     await use_case.execute(post_id)
     return {"message": "Post deleted successfully"}
+
+@router.get("/search", response_model=list[PostResponse])
+async def search_posts(query: str):
+    post_repo = MongoPostRepository()
+    use_case = SearchPostsUseCase(post_repo)
+    return await use_case.execute(query)
+
+@router.get("/tag/{tag}", response_model=list[PostResponse])
+async def get_posts_by_tag(tag: str):
+    post_repo = MongoPostRepository()
+    use_case = GetPostsByTagUseCase(post_repo)
+    return await use_case.execute(tag)
