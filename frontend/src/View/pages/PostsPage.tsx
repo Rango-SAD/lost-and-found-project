@@ -72,7 +72,7 @@ export function PostsPage() {
                 headers: { "Content-Type": "application/json" },
                 body: JSON.stringify({ reporter_username: "admin" }),
             });
-        } catch 
+        } catch {}
     }
 
     return (
