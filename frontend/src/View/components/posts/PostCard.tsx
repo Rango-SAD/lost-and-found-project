@@ -26,7 +26,7 @@ export function PostCard({ post, onComment, onReport, onOpen }: Props) {
             <div
                 dir="rtl"
                 className={cn(
-                    "group relative w-full max-w-[520px] rounded-[34px] overflow-hidden",
+                    "group relative w-full h-full flex flex-col rounded-[34px] overflow-hidden",
                     "border transition-all duration-200"
                 )}
                 style={{
@@ -59,7 +59,7 @@ export function PostCard({ post, onComment, onReport, onOpen }: Props) {
                     <div className="absolute -bottom-28 -right-24 h-72 w-72 rounded-full bg-sky-500/10 blur-3xl" />
                 </div>
 
-                <div className="relative px-7 pt-6 pb-5">
+                <div className="relative px-7 pt-6 pb-5 flex flex-col flex-1">
                     <div
                         className="text-center text-[15px] font-semibold"
                         style={{ color: "var(--text-secondary)" }}
@@ -95,9 +95,7 @@ export function PostCard({ post, onComment, onReport, onOpen }: Props) {
                         </div>
 
                         <div
-                            className={cn(
-                                "relative h-[120px] w-[180px] overflow-hidden rounded-[26px] ring-1"
-                            )}
+                            className="relative h-[120px] w-[180px] overflow-hidden rounded-[26px] ring-1"
                             style={{
                                 background: "var(--surface-2)",
                                 borderColor: "var(--border-soft)",
@@ -204,7 +202,7 @@ export function PostCard({ post, onComment, onReport, onOpen }: Props) {
                         </div>
                     </div>
 
-                    <div className="mt-6 flex items-center gap-3">
+                    <div className="mt-auto pt-6 flex items-center gap-3">
                         <button
                             type="button"
                             onClick={(e) => {
@@ -261,7 +259,7 @@ export function PostCard({ post, onComment, onReport, onOpen }: Props) {
                     />
 
                     <div
-                        className={cn("relative w-full max-w-[420px] rounded-[26px] p-6")}
+                        className="relative w-full max-w-[420px] rounded-[26px] p-6"
                         style={{
                             background:
                                 theme === "light"

@@ -1,5 +1,5 @@
 import React, { useState, useCallback, useMemo, useEffect } from 'react';
-import { MapContainer, TileLayer, Polygon, Marker, Tooltip, useMapEvents, useMap } from 'react-leaflet';
+import { MapContainer, TileLayer, Polygon, Marker, useMapEvents, useMap } from 'react-leaflet';
 import 'leaflet/dist/leaflet.css';
 import { SHARIF_CENTER, OUTER_WORLD, SHARIF_BOUNDARY, BUILDINGS } from './mapData';
 import { PostCard } from '../posts/PostCard';
@@ -114,11 +114,7 @@ const UniversityMap: React.FC<MapProps> = ({ selectable, onLocationSelect, showE
                 ))}
 
                 {showExistingItems && clusters.map((cluster, idx) => {
-                    const isSingle    = cluster.items.length === 1;
-                    const icon        = makeClusterIcon(cluster.lostCount, cluster.foundCount, pinSize);
-                    const tooltipText = isSingle
-                        ? `${cluster.items[0].itemName} (${cluster.items[0].status})`
-                        : `${cluster.items.length} مورد · ${cluster.lostCount} گم‌شده · ${cluster.foundCount} پیدا‌شده`;
+                    const icon = makeClusterIcon(cluster.lostCount, cluster.foundCount, pinSize);
 
                     return (
                         <Marker
@@ -129,15 +125,6 @@ const UniversityMap: React.FC<MapProps> = ({ selectable, onLocationSelect, showE
                                 click: () => setSelectedPostId(cluster.items[0].id)
                             }}
                         >
-                            {pinSize >= 22 && (
-                                <Tooltip
-                                    direction="top"
-                                    offset={[0, -(Math.round(pinSize * (isSingle ? 0.7 : 1) * 1.33) + 4)]}
-                                    opacity={0.92}
-                                >
-                                    {tooltipText}
-                                </Tooltip>
-                            )}
                         </Marker>
                     );
                 })}
