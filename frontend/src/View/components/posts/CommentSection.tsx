@@ -1,5 +1,6 @@
 import { useEffect, useRef, useState } from "react";
 import { useTheme } from "../../../Infrastructure/Contexts/ThemeContext";
+import { MoreVertical, ShieldAlert, X, AlertTriangle } from "lucide-react";
 
 interface Comment {
     id: string;
@@ -207,6 +208,55 @@ export function CommentSection({ postId, onClose, hideHeader = false }: Props) {
                     </button>
                 </div>
             </div>
+
+            {reportingCommentId && (
+                <div className="absolute inset-0 z-[100] flex items-center justify-center px-4 animate-in fade-in duration-300">
+                    <div 
+                        className="absolute inset-0 bg-black/60 backdrop-blur-sm" 
+                        onClick={() => setReportingCommentId(null)} 
+                    />
+                    
+                    <div className={cn(
+                        "relative w-full max-w-[290px] rounded-[32px] p-8 shadow-[0_20px_50px_rgba(0,0,0,0.5)] border text-center animate-in zoom-in-95 duration-200",
+                        "bg-white border-slate-100",
+                        "dark:bg-[#1c2237] dark:border-white/10"
+                    )}>
+                        <div className="w-16 h-16 bg-red-500/10 dark:bg-red-500/20 rounded-full flex items-center justify-center mx-auto mb-5">
+                            <AlertTriangle className="text-red-500 w-8 h-8" />
+                        </div>
+
+                        <h3 className="text-[17px] font-extrabold mb-3 text-slate-800 dark:text-white">
+                            گزارش تخلف
+                        </h3>
+                        
+                        <p className="text-[13px] leading-6 mb-8 text-slate-500 dark:text-slate-400 font-medium">
+                            آیا از گزارش این کامنت اطمینان دارید؟ 
+                            <br />
+                            این عمل قابل بازگشت نیست.
+                        </p>
+                        
+                        <div className="flex flex-col gap-3">
+                            <button 
+                                onClick={handleReportSubmit}
+                                className="w-full py-4 bg-red-500 hover:bg-red-600 text-white rounded-2xl text-[14px] font-bold transition-all active:scale-95 shadow-lg shadow-red-500/20"
+                            >
+                                بله، مطمئنم
+                            </button>
+                            
+                            <button 
+                                onClick={() => setReportingCommentId(null)}
+                                className={cn(
+                                    "w-full py-4 rounded-2xl text-[14px] font-bold transition-all active:scale-95",
+                                    "bg-slate-100 text-slate-600 hover:bg-slate-200",
+                                    "dark:bg-white/5 dark:text-slate-400 dark:hover:bg-white/10"
+                                )}
+                            >
+                                انصراف
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            )}
         </div>
     );
 }

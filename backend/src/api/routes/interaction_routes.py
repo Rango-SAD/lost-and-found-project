@@ -1,7 +1,8 @@
-from fastapi import APIRouter, HTTPException, Body
+from fastapi import APIRouter, HTTPException, Body, Depends
 from src.infrastructure.database.models.post_document import PostDocument
 from src.infrastructure.database.models.comment_document import CommentDocument
 from src.infrastructure.database.models.report_document import ReportDocument
+from src.infrastructure.security.auth_handler import AuthHandler
 from pydantic import BaseModel
 from typing import Optional
 
@@ -9,7 +10,6 @@ router = APIRouter(prefix="/interact", tags=["Interactions"])
 
 class CommentRequest(BaseModel):
     post_id: str
-    publisher_username: str
     content: str
     parent_id: Optional[str] = None
 
@@ -35,14 +35,14 @@ async def get_comments(post_id: str):
 
 
 @router.post("/comment")
-async def add_comment(req: CommentRequest):
+async def add_comment(req: CommentRequest, current_user: str = Depends(AuthHandler.get_current_user)):
     post = await PostDocument.get(req.post_id)
     if not post:
         raise HTTPException(status_code=404, detail="پستی با این کد پیدا نشد")
 
     comment = CommentDocument(
         post_id=req.post_id,
-        publisher_username=req.publisher_username,
+        publisher_username=current_user, 
         content=req.content,
         parent_id=req.parent_id,
     )
@@ -51,11 +51,7 @@ async def add_comment(req: CommentRequest):
 
 
 @router.post("/report/{target_type}/{target_id}")
-async def report_content(
-    target_type: str,
-    target_id: str,
-    reporter_username: str = Body(..., embed=True),
-):
+async def report_content(target_type: str, target_id: str, current_user: str = Depends(AuthHandler.get_current_user)):
     if target_type == "post":
         doc = await PostDocument.get(target_id)
     elif target_type == "comment":
@@ -67,7 +63,7 @@ async def report_content(
         raise HTTPException(status_code=404, detail="محتوا یافت نشد")
 
     report = ReportDocument(
-        reporter_username=reporter_username,
+        reporter_username=current_user, 
         target_id=target_id,
         target_type=target_type,
         reason="گزارش کاربر",

@@ -5,12 +5,25 @@ import { CommentSection } from "../components/posts/CommentSection";
 import { FilterBar } from "../components/posts/postPage/FilterBar";
 import { MobileBottomSheet } from "../components/posts/postPage/MobileBottomSheet";
 import { API_URL, mapBackendPost, type BackendPost, type FilterState } from "../components/posts/postPage/postsTypes";
+import { PostFilters } from "../components/posts/PostFilters"; 
+import { useTheme } from "../../Infrastructure/Contexts/ThemeContext";
+
+type DbItem = {
+    id: string; itemName: string; tag: string; category: string;
+    description: string; status: string; photoData?: string;
+    date?: string; timestamp?: string;
+};
+
+const API_URL = "http://127.0.0.1:3001/lostAndFoundItems";
 
 export function PostsPage() {
     const [items, setItems]               = useState<BackendPost[]>([]);
     const [loading, setLoading]           = useState(true);
     const [error, setError]               = useState<string | null>(null);
     const [activePostId, setActivePostId] = useState<string | null>(null);
+    const [searchQuery, setSearchQuery] = useState("");
+    const [selectedCategory, setSelectedCategory] = useState("All");
+
     const { theme } = useTheme();
     const isDark = theme !== "light";
 
@@ -137,6 +150,10 @@ export function PostsPage() {
                             }
                         </div>
                     )}
+                    
+                    {!loading && filteredPosts.length === 0 && (
+                        <div className="text-center py-20 opacity-30 text-lg italic">موردی یافت نشد...</div>
+                    )}
                 </main>
             </div>
 
@@ -164,4 +181,29 @@ export function PostsPage() {
             )}
         </div>
     );
+}
+
+function mapDbItemToPost(item: DbItem): LostFoundPost {
+    const publishedAt = item.date || (item.timestamp ? new Date(item.timestamp).toLocaleString("fa-IR") : "");
+    const mapCategory = (dbCat: string): LostFoundPost["category"] => {
+        const c = (dbCat || "").toLowerCase();
+        if (["electronics", "documents", "keys", "clothing", "books"].includes(c)) {
+            return (c.charAt(0).toUpperCase() + c.slice(1)) as any;
+        }
+        return "Other";
+    };
+
+    return {
+        id: item.id,
+        type: (item.status || "").includes("گم") ? "LOST" : "FOUND",
+        status: "Open",
+        category: mapCategory(item.category),
+        itemName: item.itemName,
+        tag: item.tag,
+        location: "—",
+        description: item.description,
+        publisherName: "کاربر",
+        publishedAt,
+        imageUrl: item.photoData
+    };
 }
