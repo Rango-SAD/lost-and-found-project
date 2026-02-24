@@ -53,10 +53,10 @@ export function pinSizeFromZoom(zoom: number): number {
 }
 
 export function labelFontFromZoom(zoom: number): string {
-    if (zoom >= 18) return '10px';
-    if (zoom >= 17) return '8px';
-    if (zoom >= 16) return '6.5px';
-    if (zoom >= 15) return '5px';
+    if (zoom >= 18) return '7px';
+    if (zoom >= 17) return '6px';
+    if (zoom >= 16) return '5px';
+    if (zoom >= 15) return '4px';
     return '0px';
 }
 

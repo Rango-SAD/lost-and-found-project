@@ -97,3 +97,13 @@ input::placeholder {
     color: var(--text-muted);
     opacity: 0.7;
 }
+
+@media (max-width: 1023px) {
+    body.sheet-open nav,
+    body.sheet-open header {
+        opacity: 0;
+        pointer-events: none;
+        transform: translateY(8px);
+        transition: opacity 0.25s ease, transform 0.25s ease;
+    }
+}

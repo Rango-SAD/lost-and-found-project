@@ -2,6 +2,8 @@ import { IAuthFacade } from "../../Domain/Services/Interface/IAuthFacade";
 import { LoginForm } from "../../Domain/Types/Auth";
 import { loginApi, requestRegisterCodeApi, verifyRegisterCodeApi, registerApi } from "../Interfaces/AuthApi";
 
+const API_URL = 'http://127.0.0.1:8000'
+
 export const authFacade = {
   login: async (data: LoginForm) => {
     const response = await fetch(`${API_URL}/auth/login`, {
