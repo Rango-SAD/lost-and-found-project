@@ -6,15 +6,12 @@ import { FilterBar } from "../components/posts/postPage/FilterBar";
 import { MobileBottomSheet } from "../components/posts/postPage/MobileBottomSheet";
 import { API_URL, mapBackendPost, type BackendPost, type FilterState } from "../components/posts/postPage/postsTypes";
 import { PostFilters } from "../components/posts/PostFilters"; 
-import { useTheme } from "../../Infrastructure/Contexts/ThemeContext";
 
 type DbItem = {
     id: string; itemName: string; tag: string; category: string;
     description: string; status: string; photoData?: string;
     date?: string; timestamp?: string;
 };
-
-const API_URL = "http://127.0.0.1:3001/lostAndFoundItems";
 
 export function PostsPage() {
     const [items, setItems]               = useState<BackendPost[]>([]);
