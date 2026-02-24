@@ -4,6 +4,7 @@ import "./ProfileViewStyle.css";
 
 interface ProfileViewProps {
   username: string;
+  token?: string; 
 }
 
 interface Item {
@@ -18,14 +19,14 @@ interface Item {
   timestamp: string;
 }
 
-const ProfileView: React.FC<ProfileViewProps> = ({ username }) => {
+const ProfileView: React.FC<ProfileViewProps> = ({ username, token }) => {
   const navigate = useNavigate();
   const [items, setItems] = useState<Item[]>([]);
   const [activeMenu, setActiveMenu] = useState<number | null>(null);
   const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
   const [itemToDelete, setItemToDelete] = useState<number | null>(null);
 
-  const API_URL = `http://localhost:8000/posts/publisher/${username}`;
+  const API_URL = `http://localhost:8000/posts/`;
 
   useEffect(() => {
     if (username) {
@@ -35,7 +36,7 @@ const ProfileView: React.FC<ProfileViewProps> = ({ username }) => {
 
   const fetchItems = async () => {
     try {
-      const response = await fetch(API_URL);
+      const response = await fetch(`${API_URL}publisher/${username}`);
       if (response.ok) {
         const data = await response.json();
         setItems(data);
@@ -49,8 +50,14 @@ const ProfileView: React.FC<ProfileViewProps> = ({ username }) => {
 
   const handleDelete = async (id: number) => {
     try {
-      const response = await fetch(`${API_URL}/${id}`, {
+      const authToken = token || localStorage.getItem("token");
+
+      const response = await fetch(`${API_URL}${id}`, {
         method: 'DELETE',
+        headers: {
+          'Authorization': `Bearer ${authToken}`,
+          'Content-Type': 'application/json'
+        },
       });
 
       if (response.ok) {
