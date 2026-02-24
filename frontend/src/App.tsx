@@ -52,7 +52,7 @@ export default function App() {
         <Route path="/register/verify" element={<RequestCodePage />} />
         <Route path="/newItem" element={<ItemEntryView />} />
         <Route path="/map" element={<MapView />} />
-        <Route path="/profile" element={<ProfileView />} />
+        <Route path="/profile" element={<ProfileView  username={username}/>} />
         <Route path="/edit" element={<EditView />} />
         <Route path="*" element={<Navigate to="/posts" replace />} />
       </Routes>

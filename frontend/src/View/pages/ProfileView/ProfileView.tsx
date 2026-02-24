@@ -2,6 +2,10 @@ import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import "./ProfileViewStyle.css";
 
+interface ProfileViewProps {
+  username: string;
+}
+
 interface Item {
   id: number;
   itemName: string;
@@ -14,18 +18,20 @@ interface Item {
   timestamp: string;
 }
 
-function ProfileView() {
+const ProfileView: React.FC<ProfileViewProps> = ({ username }) => {
   const navigate = useNavigate();
   const [items, setItems] = useState<Item[]>([]);
   const [activeMenu, setActiveMenu] = useState<number | null>(null);
   const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
   const [itemToDelete, setItemToDelete] = useState<number | null>(null);
 
-  const API_URL = "http://localhost:3001/lostAndFoundItems";
+  const API_URL = `http://localhost:8000/posts/publisher/${username}`;
 
   useEffect(() => {
-    fetchItems();
-  }, []);
+    if (username) {
+      fetchItems();
+    }
+  }, [username]);
 
   const fetchItems = async () => {
     try {
