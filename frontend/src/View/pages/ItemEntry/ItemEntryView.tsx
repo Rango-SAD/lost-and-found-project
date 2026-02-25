@@ -118,13 +118,24 @@ function ItemEntryView() {
       setShowError(true); setTimeout(() => setShowError(false), 3000); return;
     }
 
+    const token = localStorage.getItem("accessToken");
+    if (!token) {
+      setErrorMessage("لطفاً ابتدا وارد حساب کاربری خود شوید");
+      setShowError(true);
+      setTimeout(() => {
+        setShowError(false);
+        navigate("/login");
+      }, 2000);
+      return;
+    }
+
     const body = {
       type:               isFound ? "found" : "lost",
       title:              itemName,
       category_key:       category,
       tag:                tag || "",
       description:        description || "",
-      publisher_username: "admin",
+      publisher_username: localStorage.getItem("username") || "",
       location:           selectedPos
         ? { type: "Point", coordinates: [selectedPos.lng, selectedPos.lat] }
         : { type: "Point", coordinates: [51.3515, 35.7036] },
@@ -134,7 +145,10 @@ function ItemEntryView() {
     try {
       const response = await fetch("http://localhost:8000/posts/add", {
         method:  "POST",
-        headers: { "Content-Type": "application/json" },
+        headers: {
+          "Content-Type": "application/json",
+          "Authorization": `Bearer ${token}`,
+        },
         body:    JSON.stringify(body),
       });
 
@@ -147,6 +161,15 @@ function ItemEntryView() {
           setItemName(""); setTag(""); setCategory("");
           setDescription(""); setPhoto(null); setPhotoPreview("");
           setIsFound(false); setSelectedPos(null);
+        }, 2000);
+      } else if (response.status === 401 || response.status === 403) {
+        localStorage.removeItem("accessToken");
+        localStorage.removeItem("username");
+        setErrorMessage("نشست شما منقضی شده. لطفاً دوباره وارد شوید");
+        setShowError(true);
+        setTimeout(() => {
+          setShowError(false);
+          navigate("/login");
         }, 2000);
       } else {
         throw new Error("خطا در ذخیره‌سازی");
