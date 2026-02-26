@@ -25,3 +25,19 @@ __pycache__/
 *$py.class
 # Python bytecode
 **/__pycache__/
+
+# Sensitive files
+.env
+cookies.txt
+
+# Test & Coverage
+.coverage
+htmlcov/
+.pytest_cache/
+
+# IDEs
+.vscode/
+.idea/
+
+# OS files
+.DS_Store
