@@ -65,6 +65,17 @@ class MongoPostRepository(IPostRepository):
         if doc:
             await doc.delete()
 
+    async def search_in_title_and_description(self, query: str):
+        return await PostDocument.find(
+            {"$text": {"$search": query}}
+        ).to_list()
+
+    async def get_by_tag(self, tag: str):
+        docs = await PostDocument.find(
+            PostDocument.tag == tag
+        ).to_list()
+        return [self._to_entity(doc) for doc in docs]
+    
     # ---------- private ----------
 
     def _to_entity(self, doc: PostDocument) -> Post:

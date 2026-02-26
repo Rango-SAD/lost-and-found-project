@@ -33,3 +33,11 @@ class IPostRepository(ABC):
     @abstractmethod
     async def delete(self, post_id: str) -> None:
         pass
+
+    @abstractmethod
+    async def search_in_title_and_description(self, query: str):
+        pass
+
+    @abstractmethod
+    async def get_by_tag(self, tag: str):
+        pass

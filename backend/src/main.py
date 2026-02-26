@@ -53,6 +53,17 @@ async def lifespan(app: FastAPI):
         print("✅ Test user 'admin' created successfully.")
     
     yield
+
+    # Text index for title + description
+    await PostDocument.get_motor_collection().create_index(
+        [
+            ("title", "text"),
+            ("description", "text"),
+        ]
+    )
+
+    # Index for tags
+    await PostDocument.get_motor_collection().create_index("tags")
     client.close()
 
 app = FastAPI(title="Lost and Found University System", lifespan=lifespan) 
