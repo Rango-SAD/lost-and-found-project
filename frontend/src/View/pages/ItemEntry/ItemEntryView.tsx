@@ -49,7 +49,6 @@ function clearDraft() {
   sessionStorage.removeItem(SS_KEY);
 }
 
-
 function ItemEntryView() {
   const navigate = useNavigate();
   const location = useLocation();
@@ -113,11 +112,7 @@ function ItemEntryView() {
       setErrorMessage("لطفاً دسته‌بندی را انتخاب کنید");
       setShowError(true); setTimeout(() => setShowError(false), 3000); return;
     }
-    if (!photo && !photoPreview) {
-      setErrorMessage("لطفاً عکس آپلود کنید");
-      setShowError(true); setTimeout(() => setShowError(false), 3000); return;
-    }
-
+    
     const token = localStorage.getItem("token");
     if (!token) {
       setErrorMessage("لطفاً ابتدا وارد حساب کاربری خود شوید");
@@ -135,11 +130,14 @@ function ItemEntryView() {
       category_key:       category,
       tag:                tag || "",
       description:        description || "",
-      publisher_username: localStorage.getItem("username") || "",
-      location:           selectedPos
-        ? { type: "Point", coordinates: [selectedPos.lng, selectedPos.lat] }
-        : { type: "Point", coordinates: [51.3515, 35.7036] },
-      image_url: null,
+      publisher_username: localStorage.getItem("username") || "Unknown",
+      location:           {
+          type: "Point",
+          coordinates: selectedPos 
+            ? [selectedPos.lng, selectedPos.lat] 
+            : [51.3515, 35.7036]
+      },
+      image_url:          photoPreview || "" 
     };
 
     try {
@@ -210,10 +208,10 @@ function ItemEntryView() {
             <select className="glass-input appearance-none cursor-pointer"
               value={category} onChange={e => setCategory(e.target.value)}>
               <option value="" disabled>دسته بندی</option>
-              <option value="electronics">الکترونیک</option>
+              <option value="electronics">الکترونیکی</option>
               <option value="documents">مدارک</option>
               <option value="wallets">کیف پول / کارت</option>
-              <option value="clothing">لباس</option>
+              <option value="clothing">پوشاک</option>
               <option value="accessories">لوازم جانبی</option>
               <option value="keys">کلید</option>
               <option value="books">کتاب</option>
@@ -288,7 +286,7 @@ function ItemEntryView() {
               <>
                 <div className="text-4xl mb-2" style={{ color: "var(--text-muted)", opacity: 0.3 }}>📷</div>
                 <span className="text-[10px] uppercase tracking-widest"
-                  style={{ color: "var(--text-muted)", opacity: 0.5 }}>Upload Photo</span>
+                  style={{ color: "var(--text-muted)", opacity: 0.5 }}>Upload Photo (Optional)</span>
               </>
             )}
           </div>
