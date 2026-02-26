@@ -118,7 +118,7 @@ function ItemEntryView() {
       setShowError(true); setTimeout(() => setShowError(false), 3000); return;
     }
 
-    const token = localStorage.getItem("accessToken");
+    const token = localStorage.getItem("token");
     if (!token) {
       setErrorMessage("لطفاً ابتدا وارد حساب کاربری خود شوید");
       setShowError(true);
@@ -163,7 +163,7 @@ function ItemEntryView() {
           setIsFound(false); setSelectedPos(null);
         }, 2000);
       } else if (response.status === 401 || response.status === 403) {
-        localStorage.removeItem("accessToken");
+        localStorage.removeItem("token");
         localStorage.removeItem("username");
         setErrorMessage("نشست شما منقضی شده. لطفاً دوباره وارد شوید");
         setShowError(true);
@@ -210,10 +210,10 @@ function ItemEntryView() {
             <select className="glass-input appearance-none cursor-pointer"
               value={category} onChange={e => setCategory(e.target.value)}>
               <option value="" disabled>دسته بندی</option>
-              <option value="electronics">الکترونیکی</option>
+              <option value="electronics">الکترونیک</option>
               <option value="documents">مدارک</option>
               <option value="wallets">کیف پول / کارت</option>
-              <option value="clothing">پوشاک</option>
+              <option value="clothing">لباس</option>
               <option value="accessories">لوازم جانبی</option>
               <option value="keys">کلید</option>
               <option value="books">کتاب</option>
