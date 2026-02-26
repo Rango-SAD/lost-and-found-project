@@ -185,11 +185,10 @@ function EditView({ token }: EditViewProps) {
               onChange={(e) => setCategoryKey(e.target.value)}
             >
               <option value="" disabled>دسته بندی (اجباری)</option>
-              {/* مقادیر value باید با مقادیر مورد قبول backend برای category_key یکی باشند */}
-              <option value="electronics">الکترونیک</option>
+              <option value="electronics">الکترونیکی</option>
               <option value="documents">مدارک</option>
               <option value="wallets">کیف پول / کارت</option>
-              <option value="clothing">لباس</option>
+              <option value="clothing">پوشاک</option>
               <option value="accessories">لوازم جانبی</option>
               <option value="keys">کلید</option>
               <option value="books">کتاب</option>
