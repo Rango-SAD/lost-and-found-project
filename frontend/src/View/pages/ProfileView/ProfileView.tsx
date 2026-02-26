@@ -2,34 +2,58 @@ import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import "./ProfileViewStyle.css";
 
-interface Item {
-  id: number;
-  itemName: string;
-  tag: string;
-  category: string;
-  description: string;
-  status: string;
-  photoName: string;
-  photoData?: string;
-  timestamp: string;
+interface ProfileViewProps {
+  username: string;
+  token?: string; 
 }
 
-function ProfileView() {
+interface Item {
+  id: string;
+  type: "lost" | "found";
+  title: string;
+  category_key: string;
+  tag: string;
+  description: string;
+  publisher_username: string;
+  location: {
+    type: string;
+    coordinates: number[];
+  };
+  reports_count: number;
+  image_url: string;
+  created_at: string;
+}
+
+const categoryLabels: Record<string, string> = {
+  electronics: 'الکترونیکی',
+  documents: 'مدارک',
+  keys: 'کلید',
+  clothing: 'پوشاک',
+  wallets: 'کیف پول / کارت',
+  accessories: 'لوازم جانبی',
+  books: 'کتاب',
+  other: 'سایر'
+};
+
+const ProfileView: React.FC<ProfileViewProps> = ({ username, token }) => {
   const navigate = useNavigate();
   const [items, setItems] = useState<Item[]>([]);
-  const [activeMenu, setActiveMenu] = useState<number | null>(null);
+  
+  const [activeMenu, setActiveMenu] = useState<string | null>(null);
   const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
-  const [itemToDelete, setItemToDelete] = useState<number | null>(null);
+  const [itemToDelete, setItemToDelete] = useState<string | null>(null);
 
-  const API_URL = "http://localhost:3001/lostAndFoundItems";
+  const API_URL = `http://localhost:8000/posts/`;
 
   useEffect(() => {
-    fetchItems();
-  }, []);
+    if (username) {
+      fetchItems();
+    }
+  }, [username]);
 
   const fetchItems = async () => {
     try {
-      const response = await fetch(API_URL);
+      const response = await fetch(`${API_URL}publisher/${username}`);
       if (response.ok) {
         const data = await response.json();
         setItems(data);
@@ -41,10 +65,16 @@ function ProfileView() {
     }
   };
 
-  const handleDelete = async (id: number) => {
+  const handleDelete = async (id: string) => {
     try {
-      const response = await fetch(`${API_URL}/${id}`, {
+      const authToken = token || localStorage.getItem("token");
+
+      const response = await fetch(`${API_URL}${id}`, {
         method: 'DELETE',
+        headers: {
+          'Authorization': `Bearer ${authToken}`,
+          'Content-Type': 'application/json'
+        },
       });
 
       if (response.ok) {
@@ -63,11 +93,11 @@ function ProfileView() {
     navigate('/edit', { state: { item } });
   };
 
-  const toggleMenu = (id: number) => {
+  const toggleMenu = (id: string) => {
     setActiveMenu(activeMenu === id ? null : id);
   };
 
-  const confirmDelete = (id: number) => {
+  const confirmDelete = (id: string) => {
     setItemToDelete(id);
     setShowDeleteConfirm(true);
     setActiveMenu(null);
@@ -87,13 +117,12 @@ function ProfileView() {
       <div className="items-grid pt-24"> 
         {items.length > 0 ? (
           items.map((item) => (
-            <div key={item.id} className="item-card">
+            <div key={item.id} className="item-card relative">
               
-              <div className="flex justify-start mb-3">
-                <div className={`category-badge category-${item.category}`}>
-                  {item.category === 'electronics' ? 'الکترونیک' : 
-                   item.category === 'documents' ? 'مدارک' : 
-                   item.category === 'keys' ? 'کلید' : 'سایر'}
+
+              <div className="flex justify-between items-center mb-3 px-1">
+                <div className={`category-badge category-${item.category_key}`}>
+                  {categoryLabels[item.category_key] || item.category_key}
                 </div>
               </div>
 
@@ -113,8 +142,8 @@ function ProfileView() {
 
               <div className="card-image-wrapper">
                 <div className="card-image">
-                  {item.photoData ? (
-                    <img src={item.photoData} alt={item.itemName} className="card-photo" />
+                  {item.image_url ? (
+                    <img src={item.image_url} alt={item.title} className="card-photo" />
                   ) : (
                     <div className="placeholder-icon">🖼️</div>
                   )}
@@ -123,10 +152,13 @@ function ProfileView() {
 
               <div className="card-content">
                 <div className="card-header">
-                  <h3 className="card-title">{item.itemName}</h3>
-                  <span className="card-tag">{item.tag}</span>
+                  <h3 className="card-title">{item.title}</h3>
+                  {item.tag && <span className="card-tag">{item.tag}</span>}
                 </div>
-                <p className="card-description">{item.description}</p>
+                <p className="card-description">{item.description || "بدون توضیحات"}</p>
+                <div className="text-right mt-2 text-xs text-white/40">
+                  {new Date(item.created_at).toLocaleDateString('fa-IR')}
+                </div>
               </div>
             </div>
           ))

@@ -14,9 +14,9 @@ export type Category =
 export const CATEGORY_FA: Record<Category, string> = {
     Electronics: "الکترونیکی",
     Documents: "مدارک",
-    "Wallets / Cards": "کیف/کارت",
+    "Wallets / Cards": "کیف پول/کارت",
     Clothing: "پوشاک",
-    Accessories: "اکسسوری",
+    Accessories: "لوازم جانبی",
     Keys: "کلید",
     Books: "کتاب",
     Other: "سایر",

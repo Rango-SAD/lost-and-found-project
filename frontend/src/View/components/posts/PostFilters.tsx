@@ -11,7 +11,7 @@ interface PostFiltersProps {
 
 const CATEGORIES = [
     { value: "All", label: "همه دسته‌بندی‌ها" },
-    { value: "Electronics", label: "الکترونیک" },
+    { value: "Electronics", label: "الکترونیکی" },
     { value: "Documents", label: "مدارک" },
     { value: "Keys", label: "کلید" },
     { value: "Clothing", label: "پوشاک" },
