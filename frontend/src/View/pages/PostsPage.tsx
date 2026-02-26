@@ -1,144 +1,122 @@
 import { useEffect, useMemo, useState } from "react";
-import type { LostFoundPost } from "../../Domain/Entities/LostFoundPost";
+import { useTheme } from "../../Infrastructure/Contexts/ThemeContext";
 import { PostCard } from "../components/posts/PostCard";
-
-type DbItem = {
-    id: string;
-    itemName: string;
-    tag: string;
-    category: string;     // e.g. "electronics"
-    description: string;
-    status: string;       // e.g. "گم شده" / ...
-    photoName?: string;
-    photoData?: string;
-    date?: string;        // e.g. "۱۴۰۴/۱۰/۱۵"
-    timestamp?: string;   // ISO
-};
-
-const API_URL = "http://127.0.0.1:3001/lostAndFoundItems";
-
-function mapCategory(dbCategory: string): LostFoundPost["category"] {
-    // اگر LostFoundPost.category شما union/string آزاد است، همین‌ها مشکلی ندارند.
-    // اگر strict-union داری، این map را با enum خودتان sync کن.
-    const c = (dbCategory || "").toLowerCase();
-    if (c === "electronics") return "Electronics" as LostFoundPost["category"];
-    if (c === "documents") return "Documents" as LostFoundPost["category"];
-    if (c === "keys") return "Keys" as LostFoundPost["category"];
-    if (c === "clothing") return "Clothing" as LostFoundPost["category"];
-    if (c === "books") return "Books" as LostFoundPost["category"];
-    return "Other" as LostFoundPost["category"];
-}
-
-function inferTypeFromStatus(status: string): LostFoundPost["type"] {
-    const s = (status || "").trim();
-    // بسته به دیتای خودت اینجا را تنظیم کن
-    if (s.includes("گم")) return "LOST";
-    if (s.includes("پیدا")) return "FOUND";
-    // fallback
-    return "LOST";
-}
-
-function mapDbItemToPost(item: DbItem): LostFoundPost {
-    const publishedAt =
-        item.date
-            ? item.date
-            : item.timestamp
-                ? new Date(item.timestamp).toLocaleString("fa-IR")
-                : "";
-
-    return {
-        id: item.id,
-        type: inferTypeFromStatus(item.status),
-        status: "Open", // چون db.json شما "Open/Closed" ندارد؛ فعلاً ثابت
-        category: mapCategory(item.category),
-        itemName: item.itemName,
-        tag: item.tag,
-        location: "—", // چون db.json شما location ندارد؛ فعلاً placeholder
-        description: item.description,
-        publisherName: "نام کاربری", // چون db.json شما publisher ندارد
-        publishedAt,
-    };
-}
+import { CommentSection } from "../components/posts/CommentSection";
+import { FilterBar } from "../components/posts/postPage/FilterBar";
+import { MobileBottomSheet } from "../components/posts/postPage/MobileBottomSheet";
+import { API_URL, mapBackendPost, type BackendPost, type FilterState } from "../components/posts/postPage/postsTypes";
+import { interactionFacade } from "../../Infrastructure/Utility/interactionFacade";
 
 export function PostsPage() {
-    const [items, setItems] = useState<DbItem[]>([]);
-    const [loading, setLoading] = useState(true);
-    const [error, setError] = useState<string | null>(null);
+    const [items, setItems]               = useState<BackendPost[]>([]);
+    const [loading, setLoading]           = useState(true);
+    const [error, setError]               = useState<string | null>(null);
+    const [activePostId, setActivePostId] = useState<string | null>(null);
+    const { theme } = useTheme();
+    const isDark = theme !== "light";
+
+    const [filters, setFilters] = useState<FilterState>({
+        searchText: "", filterCategory: "", filterLocation: "", filterType: "",
+    });
 
     useEffect(() => {
         let cancelled = false;
-
         async function load() {
             try {
-                setLoading(true);
-                setError(null);
-
-                const res = await fetch(API_URL);
-                if (!res.ok) throw new Error(`API error: ${res.status} ${res.statusText}`);
-
-                const data = (await res.json()) as DbItem[];
+                setLoading(true); setError(null);
+                const res = await fetch(API_URL); 
+                if (!res.ok) throw new Error(`Status: ${res.status}`);
+                const data = await res.json() as BackendPost[];
                 if (!cancelled) setItems(Array.isArray(data) ? data : []);
             } catch (e) {
-                if (!cancelled) setError(e instanceof Error ? e.message : "Unknown error");
+                if (!cancelled) setError(e instanceof Error ? e.message : "Error");
             } finally {
                 if (!cancelled) setLoading(false);
             }
         }
-
         load();
-        return () => {
-            cancelled = true;
-        };
+        return () => { cancelled = true; };
     }, []);
 
-    const posts: LostFoundPost[] = useMemo(() => items.map(mapDbItemToPost), [items]);
+    const posts = useMemo(() => items.map(mapBackendPost), [items]);
+
+    const locationOptions = useMemo(() =>
+        Array.from(new Set(posts.map(p => p.location).filter(l => l && l !== "—"))).sort()
+    , [posts]);
+
+    const filteredPosts = useMemo(() => {
+        const { searchText, filterCategory, filterLocation, filterType } = filters;
+        return posts.filter(p => {
+            const q = searchText.trim().toLowerCase();
+            if (q && !p.itemName.toLowerCase().includes(q) &&
+                     !p.description?.toLowerCase().includes(q) &&
+                     !p.tag?.toLowerCase().includes(q)) return false;
+            if (filterCategory && p.category !== filterCategory) return false;
+            if (filterLocation && p.location !== filterLocation) return false;
+            if (filterType && p.type !== filterType.toUpperCase()) return false;
+            return true;
+        });
+    }, [posts, filters]);
+
+    const activePost    = posts.find(p => p.id === activePostId) ?? null;
+    const isCommentOpen = activePostId !== null;
+
+    async function handleReport(postId: string) {
+        try {
+            const res = await interactionFacade.reportContent("post", postId);
+            if (res.deleted) {
+                setItems(prev => prev.filter(item => (item._id || item.id) !== postId));
+                if (activePostId === postId) setActivePostId(null);
+            }
+        } catch (err: any) {
+            alert(err.message);
+        }
+    }
 
     return (
-        <div
-            dir="rtl"
-            className="min-h-screen flex items-center justify-center bg-[linear-gradient(45deg,rgba(18,24,43,0.5)_0%,rgba(16,21,39,0.77)_0%,rgba(15,19,36,1)_63%,rgba(14,18,34,0.77)_100%,rgba(11,15,26,0)_100%)]"
-        >
-            {/* Fixed full background */}
-            <div className="fixed inset-0 -z-10 bg-[linear-gradient(135deg,#0b0f1a,#12182b,#0f1324)]" />
-
-            <div className="app-scroll h-full overflow-y-auto overflow-x-hidden pr-2 w-full">
-                <main className="mx-auto w-full px-6 pt-[130px] pb-16">
-                    {loading && (
-                        <div className="text-white text-center w-full py-10">
-                            در حال دریافت پست‌ها...
-                        </div>
+        <div dir="rtl" className="min-h-screen flex">
+            <div className="flex-1 transition-all duration-500 overflow-hidden min-w-0">
+                <main className="mx-auto w-full px-3 sm:px-6 pt-[90px] sm:pt-[110px] pb-16">
+                    {!isCommentOpen && (
+                        <FilterBar
+                            filters={filters}
+                            onChange={partial => setFilters(prev => ({ ...prev, ...partial }))}
+                            locationOptions={locationOptions}
+                            totalCount={posts.length}
+                            filteredCount={filteredPosts.length}
+                            isDark={isDark}
+                        />
                     )}
-
-                    {!loading && error && (
-                        <div className="text-white text-center w-full py-10">
-                            خطا در دریافت داده‌ها: {error}
-                            <div className="opacity-80 mt-2 text-sm">
-                                مطمئن شو json-server روی 3001 اجراست و آدرس API درست است.
-                            </div>
-                        </div>
-                    )}
-
-                    {!loading && !error && posts.length === 0 && (
-                        <div className="text-white text-center w-full py-10">
-                            موردی جهت نمایش یافت نشد.
-                        </div>
-                    )}
-
-                    {!loading && !error && posts.length > 0 && (
-                        <div className="grid gap-8 sm:grid-cols-1 md:grid-cols-2 lg:grid-cols-3 justify-items-center">
-                            {posts.map((p) => (
-                                <PostCard
-                                    key={p.id}
-                                    post={p}
-                                    onContact={(id) => console.log("contact", id)}
-                                    onReport={(id) => console.log("report", id)}
-                                    onOpen={(id) => console.log("open", id)}
-                                />
-                            ))}
-                        </div>
-                    )}
+                    {loading && <div className="py-20 text-center opacity-60">در حال دریافت...</div>}
+                    {!loading && error && <div className="text-center py-10 text-red-400">❌ {error}</div>}
+                    <div className={`grid gap-5 transition-all duration-500 ${isCommentOpen ? "grid-cols-1 place-items-center" : "grid-cols-1 sm:grid-cols-2 lg:grid-cols-3"}`}>
+                        {filteredPosts
+                            .filter(p => !isCommentOpen || p.id === activePostId)
+                            .map(p => (
+                                <div key={p.id} className="flex flex-col w-full">
+                                    <PostCard 
+                                        post={p} 
+                                        onComment={(id) => setActivePostId(prev => prev === id ? null : id)} 
+                                        onReport={handleReport} 
+                                        onOpen={() => {}} 
+                                    />
+                                </div>
+                            ))
+                        }
+                    </div>
                 </main>
             </div>
+            {isCommentOpen && activePost && (
+                <aside className="hidden lg:flex flex-col shrink-0 w-[380px] xl:w-[420px] sticky top-0 h-100vh border-r border-white/5"
+                    style={{ background: isDark ? "rgba(10,14,26,0.85)" : "rgba(255,255,255,0.85)", backdropFilter: "blur(40px)" }}>
+                    <div className="flex-1 flex flex-col pt-[80px] overflow-hidden">
+                        <CommentSection postId={activePost.id} onClose={() => setActivePostId(null)} />
+                    </div>
+                </aside>
+            )}
+            {isCommentOpen && activePost && (
+                <MobileBottomSheet postId={activePost.id} onClose={() => setActivePostId(null)} theme={theme} />
+            )}
         </div>
     );
 }

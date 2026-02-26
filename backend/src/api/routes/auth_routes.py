@@ -16,12 +16,12 @@ def get_login_use_case():
     repo = UserRepository()
     return LoginUseCase(repo)
 
-@router.post("/login", response_model=LoginResponse)
+@router.post("/login")
 async def login(payload: LoginRequest, use_case: LoginUseCase = Depends(get_login_use_case)):
     try:
         dto = LoginDTO(username=payload.username, password=payload.password)
         result = await use_case.execute(dto)
-        return LoginResponse(access_token=result.access_token)
+        return result
     except Exception as e:
         raise HTTPException(status_code=401, detail=str(e))
     
