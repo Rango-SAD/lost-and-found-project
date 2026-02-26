@@ -62,16 +62,19 @@ export function PostsPage() {
     const isCommentOpen = activePostId !== null;
 
     async function handleReport(postId: string) {
-        try {
-            const res = await interactionFacade.reportContent("post", postId);
-            if (res.deleted) {
-                setItems(prev => prev.filter(item => (item._id || item.id) !== postId));
-                if (activePostId === postId) setActivePostId(null);
-            }
-        } catch (err: any) {
-            alert(err.message);
+    try {
+        const res = await interactionFacade.reportContent("post", postId);
+        
+        if (res.deleted) {
+            setItems(prev => prev.filter(item => (item._id || item.id) !== postId));
+            if (activePostId === postId) setActivePostId(null);
         }
+        
+    } catch (err: any) {
+        alert(err.message); 
+        throw err; 
     }
+}
 
     return (
         <div dir="rtl" className="min-h-screen flex">

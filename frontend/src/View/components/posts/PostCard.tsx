@@ -12,14 +12,34 @@ function typeTitleFa(type: LostFoundPost["type"]) {
 type Props = {
     post: LostFoundPost;
     onComment?: (id: string) => void;
-    onReport?: (id: string) => void;
+    onReport?: (id: string) => Promise<void> | void;
     onOpen?: (id: string) => void;
 };
 
 export function PostCard({ post, onComment, onReport, onOpen }: Props) {
     const [reportOpen, setReportOpen] = useState(false);
+    const [isReporting, setIsReporting] = useState(false);
     const { theme } = useTheme();
     const toast = useToast();
+
+    const handleConfirmReport = async () => {
+        if (!onReport) return;
+
+        try {
+            setIsReporting(true);
+            
+            await onReport(post.id);
+
+            toast.push("ریپورت شما ثبت شد");
+            setReportOpen(false);
+        } catch (error) {
+            console.error("Report failed or cancelled", error);
+            
+            setReportOpen(false); 
+        } finally {
+            setIsReporting(false);
+        }
+    };
 
     return (
         <>
@@ -54,7 +74,7 @@ export function PostCard({ post, onComment, onReport, onOpen }: Props) {
                 role={onOpen ? "button" : undefined}
                 tabIndex={onOpen ? 0 : undefined}
             >
-                <div className="pointer-events-none absolute inset-0">
+                 <div className="pointer-events-none absolute inset-0">
                     <div className="absolute -top-24 -left-24 h-64 w-64 rounded-full bg-purple-500/10 blur-3xl" />
                     <div className="absolute -bottom-28 -right-24 h-72 w-72 rounded-full bg-sky-500/10 blur-3xl" />
                 </div>
@@ -101,7 +121,7 @@ export function PostCard({ post, onComment, onReport, onOpen }: Props) {
                                 borderColor: "var(--border-soft)",
                             }}
                         >
-                            <div className="pointer-events-none absolute inset-0">
+                             <div className="pointer-events-none absolute inset-0">
                                 <div
                                     className="absolute -top-10 -left-10 h-40 w-40 rounded-full blur-2xl"
                                     style={{ background: "var(--surface-3)" }}
@@ -217,7 +237,7 @@ export function PostCard({ post, onComment, onReport, onOpen }: Props) {
                             }}
                             aria-label="کامنت"
                         >
-                            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" aria-hidden="true">
+                             <svg width="18" height="18" viewBox="0 0 24 24" fill="none" aria-hidden="true">
                                 <path
                                     d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"
                                     stroke="currentColor"
@@ -251,7 +271,7 @@ export function PostCard({ post, onComment, onReport, onOpen }: Props) {
             {reportOpen ? (
                 <div
                     className="fixed inset-0 z-[999] flex items-center justify-center px-4"
-                    onClick={() => setReportOpen(false)}
+                    onClick={() => !isReporting && setReportOpen(false)}
                 >
                     <div
                         className="absolute inset-0 backdrop-blur-sm"
@@ -289,32 +309,34 @@ export function PostCard({ post, onComment, onReport, onOpen }: Props) {
                         <div className="mt-6 flex items-center justify-between gap-3">
                             <button
                                 type="button"
-                                className="h-11 flex-1 rounded-full px-6 text-[14px] font-semibold"
+                                className="h-11 flex-1 rounded-full px-6 text-[14px] font-semibold disabled:opacity-50"
                                 style={{
                                     background: "rgba(15,82,186,0.18)",
                                     border: "1px solid var(--border-medium)",
                                     color: "var(--text-primary)",
                                 }}
                                 onClick={() => setReportOpen(false)}
+                                disabled={isReporting}
                             >
                                 خیر
                             </button>
 
                             <button
                                 type="button"
-                                className="h-11 flex-1 rounded-full px-6 text-[14px] font-semibold"
+                                className="h-11 flex-1 rounded-full px-6 text-[14px] font-semibold disabled:opacity-50 flex items-center justify-center"
                                 style={{
                                     background: "rgba(184,58,45,0.18)",
                                     border: "1px solid var(--border-medium)",
                                     color: "var(--text-primary)",
                                 }}
-                                onClick={() => {
-                                    setReportOpen(false);
-                                    onReport?.(post.id);
-                                    toast.push("ریپورت شما ثبت شد");
-                                }}
+                                onClick={handleConfirmReport}
+                                disabled={isReporting}
                             >
-                                بله
+                                {isReporting ? (
+                                    <span className="w-4 h-4 rounded-full border-2 border-current border-t-transparent animate-spin" />
+                                ) : (
+                                    "بله"
+                                )}
                             </button>
                         </div>
                     </div>
