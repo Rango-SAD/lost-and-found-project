@@ -1,16 +1,12 @@
 import { useEffect, useRef, useState } from "react";
 import { useTheme } from "../../../Infrastructure/Contexts/ThemeContext";
-import { MoreVertical, ShieldAlert, X, AlertTriangle } from "lucide-react";
+import { MoreVertical, AlertTriangle } from "lucide-react";
 import { interactionFacade } from "../../../Infrastructure/Utility/interactionFacade";
 
 interface Comment {
-    id: string;
-    post_id: string;
-    publisher_username: string;
-    content: string;
-    parent_id: string | null;
-    reports_count: number;
-    created_at: string;
+    id: string; post_id: string; publisher_username: string;
+    content: string; parent_id: string | null;
+    reports_count: number; created_at: string;
 }
 
 interface Props {
@@ -19,7 +15,7 @@ interface Props {
     hideHeader?: boolean;
 }
 
-const API = "http://127.0.0.1:8000";
+const cn = (...classes: any[]) => classes.filter(Boolean).join(' ');
 
 export function CommentSection({ postId, onClose, hideHeader = false }: Props) {
     const [comments, setComments]     = useState<Comment[]>([]);
@@ -28,6 +24,8 @@ export function CommentSection({ postId, onClose, hideHeader = false }: Props) {
     const [replyTo, setReplyTo]       = useState<Comment | null>(null);
     const [submitting, setSubmitting] = useState(false);
     const [sendError, setSendError]   = useState<string | null>(null);
+    const [reportingCommentId, setReportingCommentId] = useState<string | null>(null);
+    
     const inputRef = useRef<HTMLTextAreaElement>(null);
     const { theme } = useTheme();
     const isDark = theme !== "light";
@@ -35,9 +33,7 @@ export function CommentSection({ postId, onClose, hideHeader = false }: Props) {
     async function fetchComments() {
         try {
             setLoading(true);
-            const res = await fetch(`${API}/interact/comments/${postId}`);
-            if (!res.ok) throw new Error(`${res.status}`);
-            const data = await res.json();
+            const data = await interactionFacade.getComments(postId);
             setComments(Array.isArray(data) ? data : []);
         } catch {
             setComments([]);
@@ -48,198 +44,81 @@ export function CommentSection({ postId, onClose, hideHeader = false }: Props) {
 
     useEffect(() => { fetchComments(); }, [postId]);
 
-    function handleReply(c: Comment) {
-        setReplyTo(c);
-        setTimeout(() => inputRef.current?.focus(), 50);
-    }
-
     async function handleSubmit() {
         if (!text.trim() || submitting) return;
-        setSendError(null);
-        setSubmitting(true);
+        setSubmitting(true); setSendError(null);
         try {
-            const res = await fetch(`${API}/interact/comment`, {
-                method:  "POST",
-                headers: { "Content-Type": "application/json" },
-                body: JSON.stringify({
-                    post_id:            postId,
-                    publisher_username: "admin",
-                    content:            text.trim(),
-                    parent_id:          replyTo?.id ?? null,
-                }),
+            await interactionFacade.addComment({
+                post_id: postId,
+                content: text.trim(),
+                parent_id: replyTo?.id
             });
-            if (!res.ok) throw new Error(`خطای سرور: ${res.status}`);
-            setText("");
-            setReplyTo(null);
+            setText(""); setReplyTo(null);
             await fetchComments();
-        } catch (e) {
-            setSendError(e instanceof Error ? e.message : "خطا در ارسال");
+        } catch (e: any) {
+            setSendError(e.message);
         } finally {
             setSubmitting(false);
         }
     }
 
-    const roots     = comments.filter(c => !c.parent_id);
+    async function handleReportSubmit() {
+        if (!reportingCommentId) return;
+        try {
+            await interactionFacade.reportContent("comment", reportingCommentId);
+            await fetchComments();
+        } catch (e: any) {
+            alert(e.message);
+        } finally {
+            setReportingCommentId(null);
+        }
+    }
+
+    const roots = comments.filter(c => !c.parent_id);
     const repliesOf = (id: string) => comments.filter(c => c.parent_id === id);
 
     return (
-        <div dir="rtl" className="flex flex-col h-full" style={{ color: "var(--text-primary)" }}>
-
+        <div dir="rtl" className="flex flex-col h-full relative" style={{ color: "var(--text-primary)" }}>
             {!hideHeader && (
-            <div
-                className="flex items-center justify-between px-5 py-4 border-b shrink-0"
-                style={{ borderColor: "var(--border-soft)" }}
-            >
-                <span className="font-bold text-base">
-                    نظرات {!loading && `(${comments.length})`}
-                </span>
-                <button
-                    onClick={onClose}
-                    className="text-xl leading-none opacity-60 hover:opacity-100 transition-opacity"
-                >✕</button>
-            </div>
+                <div className="flex items-center justify-between px-5 py-4 border-b shrink-0" style={{ borderColor: "var(--border-soft)" }}>
+                    <span className="font-bold text-base">نظرات ({comments.length})</span>
+                    <button onClick={onClose} className="text-xl opacity-60 hover:opacity-100">✕</button>
+                </div>
             )}
-
             <div className="flex-1 overflow-y-auto px-4 py-4 space-y-3">
-                {loading && (
-                    <div className="flex justify-center py-10">
-                        <div className="w-6 h-6 border-2 border-blue-400 border-t-transparent rounded-full animate-spin" />
-                    </div>
-                )}
-                {!loading && comments.length === 0 && (
-                    <p className="text-center opacity-40 text-sm py-8">هنوز نظری ثبت نشده</p>
-                )}
-                {!loading && roots.map(root => (
+                {loading ? <div className="flex justify-center py-10 animate-spin">...</div> : 
+                 roots.map(root => (
                     <div key={root.id} className="space-y-2">
-                        <CommentBubble
-                            comment={root}
-                            onReply={handleReply}
-                            isDark={isDark}
-                        />
+                        <CommentBubble comment={root} onReply={c => { setReplyTo(c); setTimeout(() => inputRef.current?.focus(), 50); }} isDark={isDark} onReportClick={setReportingCommentId} />
                         {repliesOf(root.id).map(reply => (
-                            <div key={reply.id} className="mr-6 relative">
-                                <div
-                                    className="absolute right-0 top-0 bottom-0 w-0.5 rounded-full"
-                                    style={{ background: "rgba(59,130,246,0.25)" }}
-                                />
-                                <div className="pr-3">
-                                    <CommentBubble
-                                        comment={reply}
-                                        onReply={handleReply}
-                                        isDark={isDark}
-                                        parentContent={
-                                            comments.find(c => c.id === reply.parent_id)?.content
-                                        }
-                                        parentUsername={
-                                            comments.find(c => c.id === reply.parent_id)?.publisher_username
-                                        }
-                                    />
-                                </div>
+                            <div key={reply.id} className="mr-6 pr-3 border-r-2 border-blue-500/20">
+                                <CommentBubble comment={reply} onReply={c => { setReplyTo(c); setTimeout(() => inputRef.current?.focus(), 50); }} isDark={isDark} onReportClick={setReportingCommentId} />
                             </div>
                         ))}
                     </div>
                 ))}
             </div>
-
-            <div
-                className="px-4 pb-5 pt-3 border-t shrink-0"
-                style={{ borderColor: "var(--border-soft)" }}
-            >
+            <div className="px-4 pb-5 pt-3 border-t shrink-0" style={{ borderColor: "var(--border-soft)" }}>
                 {replyTo && (
-                    <div
-                        className="flex items-start justify-between rounded-xl px-3 py-2 mb-2 text-xs"
-                        style={{
-                            background:  isDark ? "rgba(59,130,246,0.12)" : "rgba(59,130,246,0.07)",
-                            borderRight: "3px solid #3b82f6",
-                        }}
-                    >
-                        <div className="flex flex-col gap-0.5 flex-1 min-w-0">
-                            <span className="text-blue-400 font-semibold">{replyTo.publisher_username}</span>
-                            <span className="truncate opacity-70">{replyTo.content}</span>
-                        </div>
-                        <button
-                            onClick={() => setReplyTo(null)}
-                            className="mr-3 text-sm opacity-50 hover:opacity-100 shrink-0 mt-0.5"
-                        >✕</button>
+                    <div className="flex items-center justify-between rounded-xl px-3 py-2 mb-2 bg-blue-500/10 border-r-4 border-blue-500 text-xs">
+                        <span className="truncate">پاسخ به {replyTo.publisher_username}</span>
+                        <button onClick={() => setReplyTo(null)}>✕</button>
                     </div>
                 )}
-
-                {sendError && (
-                    <p className="text-xs text-red-400 mb-2 text-center">{sendError}</p>
-                )}
-
+                {sendError && <p className="text-[10px] text-red-400 mb-1">{sendError}</p>}
                 <div className="flex gap-2 items-end">
-                    <textarea
-                        ref={inputRef}
-                        rows={2}
-                        value={text}
-                        onChange={e => setText(e.target.value)}
-                        onKeyDown={e => {
-                            if (e.key === "Enter" && !e.shiftKey) {
-                                e.preventDefault();
-                                handleSubmit();
-                            }
-                        }}
-                        placeholder={
-                            replyTo
-                                ? `ریپلای به ${replyTo.publisher_username}...`
-                                : "نظر خود را بنویسید..."
-                        }
-                        className="flex-1 resize-none rounded-2xl px-4 py-3 text-sm outline-none"
-                        style={{
-                            background: "var(--surface-2)",
-                            border:     "1px solid var(--border-soft)",
-                            color:      "var(--text-primary)",
-                        }}
-                    />
-                    <button
-                        onClick={handleSubmit}
-                        disabled={submitting || !text.trim()}
-                        className="shrink-0 w-10 h-10 rounded-full flex items-center justify-center transition-all disabled:opacity-30"
-                        style={{ background: "#3b82f6" }}
-                    >
-                        {submitting ? (
-                            <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin" />
-                        ) : (
-                            <svg width="16" height="16" viewBox="0 0 24 24" fill="none"
-                                stroke="white" strokeWidth="2.5" strokeLinecap="round">
-                                <path d="M12 19V5M5 12l7-7 7 7" />
-                            </svg>
-                        )}
-                    </button>
+                    <textarea ref={inputRef} rows={2} value={text} onChange={e => setText(e.target.value)} placeholder="نظرتان را بنویسید..." className="flex-1 bg-transparent border rounded-xl p-2 text-sm outline-none" style={{ borderColor: "var(--border-soft)" }} />
+                    <button onClick={handleSubmit} disabled={submitting || !text.trim()} className="w-10 h-10 bg-blue-600 rounded-full flex items-center justify-center text-white">→</button>
                 </div>
             </div>
-
             {reportingCommentId && (
-                <div className="absolute inset-0 z-[100] flex items-center justify-center px-4 animate-in fade-in duration-300">
-                    <div className="absolute inset-0 bg-black/60 backdrop-blur-sm" onClick={() => setReportingCommentId(null)} />
-                    <div className={cn(
-                        "relative w-full max-w-[290px] rounded-[32px] p-8 shadow-[0_20px_50px_rgba(0,0,0,0.5)] border text-center animate-in zoom-in-95 duration-200",
-                        "bg-white border-slate-100 dark:bg-[#1c2237] dark:border-white/10"
-                    )}>
-                        <div className="w-16 h-16 bg-red-500/10 dark:bg-red-500/20 rounded-full flex items-center justify-center mx-auto mb-5">
-                            <AlertTriangle className="text-red-500 w-8 h-8" />
-                        </div>
-                        <h3 className="text-[17px] font-extrabold mb-3 text-slate-800 dark:text-white">گزارش تخلف</h3>
-                        <p className="text-[13px] leading-6 mb-8 text-slate-500 dark:text-slate-400 font-medium">آیا از گزارش این کامنت اطمینان دارید؟</p>
-                        <div className="flex flex-col gap-3">
-                            <button 
-                                onClick={handleReportSubmit}
-                                className="w-full py-4 bg-red-500 hover:bg-red-600 text-white rounded-2xl text-[14px] font-bold transition-all active:scale-95 shadow-lg shadow-red-500/20"
-                            >
-                                بله، مطمئنم
-                            </button>
-                            
-                            <button 
-                                onClick={() => setReportingCommentId(null)}
-                                className={cn(
-                                    "w-full py-4 rounded-2xl text-[14px] font-bold transition-all active:scale-95",
-                                    "bg-slate-100 text-slate-600 hover:bg-slate-200",
-                                    "dark:bg-white/5 dark:text-slate-400 dark:hover:bg-white/10"
-                                )}
-                            >
-                                انصراف
-                            </button>
+                <div className="absolute inset-0 z-[100] flex items-center justify-center bg-black/40 backdrop-blur-sm">
+                    <div className="bg-white dark:bg-slate-800 p-6 rounded-3xl text-center shadow-2xl w-[80%] max-w-[300px]">
+                        <AlertTriangle className="mx-auto text-red-500 mb-4" />
+                        <p className="text-sm mb-6">آیا از گزارش این کامنت اطمینان دارید؟</p>
+                        <div className="flex flex-col gap-2">
+                            <button onClick={handleReportSubmit} className="w-full py-2 bg-red-500 text-white rounded-xl">بله</button>
+                            <button onClick={() => setReportingCommentId(null)} className="w-full py-2 bg-slate-200 dark:bg-slate-700 rounded-xl">خیر</button>
                         </div>
                     </div>
                 </div>
@@ -248,224 +127,23 @@ export function CommentSection({ postId, onClose, hideHeader = false }: Props) {
     );
 }
 
-
-interface BubbleProps {
-    comment: Comment;
-    onReply: (c: Comment) => void;
-    isDark: boolean;
-    parentContent?: string;
-    parentUsername?: string;
-}
-
-function CommentBubble({ comment, onReply, isDark, parentContent, parentUsername }: BubbleProps) {
-    const [menuOpen, setMenuOpen]       = useState(false);
-    const [hovered, setHovered]         = useState(false);
-    const [reportOpen, setReportOpen]   = useState(false);
-    const [reporting, setReporting]     = useState(false);
-    const [reported, setReported]       = useState(false);
-
-    async function submitReport() {
-        setReporting(true);
-        try {
-            await fetch(`http://127.0.0.1:8000/interact/report/comment/${comment.id}`, {
-                method:  "POST",
-                headers: { "Content-Type": "application/json" },
-                body:    JSON.stringify({ reporter_username: "admin" }),
-            });
-            setReported(true);
-        } catch {
-        } finally {
-            setReporting(false);
-            setReportOpen(false);
-        }
-    }
-
+function CommentBubble({ comment, onReply, isDark, onReportClick }: any) {
+    const [menuOpen, setMenuOpen] = useState(false);
     return (
-        <div
-            className="relative"
-            onMouseEnter={() => setHovered(true)}
-            onMouseLeave={() => { setHovered(false); setMenuOpen(false); }}
-        >
-            <div
-                className="rounded-2xl px-4 py-3 text-sm"
-                style={{
-                    background: isDark ? "rgba(255,255,255,0.05)" : "rgba(0,0,0,0.04)",
-                    border:     "1px solid var(--border-soft)",
-                }}
-            >
-                {parentContent && (
-                    <div
-                        className="rounded-lg px-3 py-2 mb-2 text-xs"
-                        style={{
-                            background:  isDark ? "rgba(59,130,246,0.1)" : "rgba(59,130,246,0.07)",
-                            borderRight: "3px solid #3b82f6",
-                        }}
-                    >
-                        <span className="text-blue-400 font-semibold block mb-0.5">{parentUsername}</span>
-                        <span className="line-clamp-2 opacity-70">{parentContent}</span>
-                    </div>
-                )}
-
-                <div className="flex items-center justify-between mb-1.5">
-                    <span className="font-semibold text-xs" style={{ color: "var(--text-secondary)" }}>
-                        {comment.publisher_username}
-                    </span>
-
-                    <div className="flex items-center gap-2">
-                        <span className="text-[10px] opacity-40">
-                            {new Date(comment.created_at).toLocaleString("fa-IR", {
-                                hour: "2-digit", minute: "2-digit",
-                            })}
-                        </span>
-
-                        <div className="relative">
-                            <button
-                                onClick={() => setMenuOpen(v => !v)}
-                                className="w-5 h-5 flex items-center justify-center rounded-full transition-all opacity-0 group-hover:opacity-100"
-                                style={{
-                                    opacity:    hovered ? 0.6 : 0,
-                                    color:      "var(--text-muted)",
-                                }}
-                            >
-                                <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor">
-                                    <circle cx="5"  cy="12" r="2" />
-                                    <circle cx="12" cy="12" r="2" />
-                                    <circle cx="19" cy="12" r="2" />
-                                </svg>
-                            </button>
-
-                            {menuOpen && (
-                                <div
-                                    className="absolute left-0 top-6 z-20 rounded-xl overflow-hidden text-xs shadow-xl"
-                                    style={{
-                                        minWidth:   "110px",
-                                        background: isDark ? "rgba(20,26,46,0.97)" : "rgba(255,255,255,0.97)",
-                                        border:     "1px solid var(--border-medium)",
-                                    }}
-                                >
-                                    <button
-                                        onClick={() => {
-                                            setMenuOpen(false);
-                                            onReply(comment);
-                                        }}
-                                        className="w-full px-3 py-2.5 flex items-center gap-2 hover:bg-blue-500/10 transition-colors text-right"
-                                        style={{ color: "#3b82f6" }}
-                                    >
-                                        <svg width="11" height="11" viewBox="0 0 24 24" fill="none"
-                                            stroke="currentColor" strokeWidth="2.5">
-                                            <polyline points="9 17 4 12 9 7" />
-                                            <path d="M20 18v-2a4 4 0 0 0-4-4H4" />
-                                        </svg>
-                                        ریپلای
-                                    </button>
-                                    <div style={{ height: "1px", background: "var(--border-soft)" }} />
-                                    <button
-                                        onClick={() => {
-                                            setMenuOpen(false);
-                                            setReportOpen(true);
-                                        }}
-                                        className="w-full px-3 py-2.5 flex items-center gap-2 hover:bg-red-500/10 transition-colors text-right"
-                                        style={{ color: reported ? "#aaa" : "#f43f5e" }}
-                                        disabled={reported}
-                                    >
-                                        <svg width="11" height="11" viewBox="0 0 24 24" fill="none"
-                                            stroke="currentColor" strokeWidth="2.5">
-                                            <path d="M4 15s1-1 4-1 5 2 8 2 4-1 4-1V3s-1 1-4 1-5-2-8-2-4 1-4 1z" />
-                                            <line x1="4" y1="22" x2="4" y2="15" />
-                                        </svg>
-                                        {reported ? "گزارش شد ✓" : "ریپورت"}
-                                    </button>
-                                </div>
-                            )}
+        <div className="relative group p-3 rounded-2xl bg-slate-400/5 border border-transparent hover:border-slate-400/10">
+            <div className="flex justify-between items-center mb-1">
+                <span className="text-[11px] font-bold opacity-70">{comment.publisher_username}</span>
+                <div className="relative">
+                    <button onClick={() => setMenuOpen(!menuOpen)} className="p-1 opacity-0 group-hover:opacity-100"><MoreVertical size={14}/></button>
+                    {menuOpen && (
+                        <div className="absolute left-0 top-6 bg-white dark:bg-slate-700 shadow-2xl rounded-lg overflow-hidden z-20 text-[11px] min-w-[90px] border border-black/5">
+                            <button onClick={() => {onReply(comment); setMenuOpen(false);}} className="w-full p-2.5 text-right hover:bg-blue-500/10 text-blue-500">ریپلای</button>
+                            <button onClick={() => {onReportClick(comment.id); setMenuOpen(false);}} className="w-full p-2.5 text-right hover:bg-red-500/10 text-red-500">ریپورت</button>
                         </div>
-                    </div>
+                    )}
                 </div>
-
-                <p style={{ color: "var(--text-primary)", lineHeight: 1.6 }}>
-                    {comment.content}
-                </p>
             </div>
-
-            {reportOpen && (
-                <div
-                    className="fixed inset-0 z-[999] flex items-center justify-center px-4"
-                    onClick={() => setReportOpen(false)}
-                >
-                    <div className="absolute inset-0 backdrop-blur-sm"
-                        style={{ background: "rgba(0,0,0,0.5)" }} />
-
-                    <div
-                        className="relative w-full max-w-[360px] rounded-[24px] p-6"
-                        style={{
-                            background:     isDark ? "rgba(18,24,43,0.97)" : "rgba(244,247,251,0.97)",
-                            backdropFilter: "blur(24px)",
-                            border:         "1px solid var(--border-medium)",
-                            boxShadow:      "0 25px 80px rgba(0,0,0,0.4)",
-                        }}
-                        onClick={e => e.stopPropagation()}
-                    >
-                        <div className="flex justify-center mb-4">
-                            <div className="w-12 h-12 rounded-full flex items-center justify-center"
-                                style={{ background: "rgba(244,63,94,0.12)" }}>
-                                <svg width="22" height="22" viewBox="0 0 24 24" fill="none"
-                                    stroke="#f43f5e" strokeWidth="2" strokeLinecap="round">
-                                    <path d="M4 15s1-1 4-1 5 2 8 2 4-1 4-1V3s-1 1-4 1-5-2-8-2-4 1-4 1z" />
-                                    <line x1="4" y1="22" x2="4" y2="15" />
-                                </svg>
-                            </div>
-                        </div>
-
-                        <div className="text-center text-[15px] font-semibold mb-2"
-                            style={{ color: "var(--text-primary)" }}>
-                            ریپورت کامنت
-                        </div>
-                        <div className="text-center text-[13px] mb-1"
-                            style={{ color: "var(--text-secondary)" }}>
-                            آیا از گزارش این نظر مطمئن هستید؟
-                        </div>
-
-                        <div className="mt-3 mb-5 px-3 py-2 rounded-xl text-xs line-clamp-2 text-right"
-                            style={{
-                                background:  isDark ? "rgba(255,255,255,0.05)" : "rgba(0,0,0,0.04)",
-                                border:      "1px solid var(--border-soft)",
-                                color:       "var(--text-muted)",
-                            }}>
-                            "{comment.content}"
-                        </div>
-
-                        <div className="flex gap-3">
-                            <button
-                                onClick={() => setReportOpen(false)}
-                                className="flex-1 h-11 rounded-full text-[14px] font-semibold transition-all"
-                                style={{
-                                    background: isDark ? "rgba(255,255,255,0.07)" : "rgba(0,0,0,0.06)",
-                                    border:     "1px solid var(--border-soft)",
-                                    color:      "var(--text-secondary)",
-                                }}
-                            >
-                                لغو
-                            </button>
-                            <button
-                                onClick={submitReport}
-                                disabled={reporting}
-                                className="flex-1 h-11 rounded-full text-[14px] font-semibold transition-all disabled:opacity-60"
-                                style={{
-                                    background: "rgba(244,63,94,0.18)",
-                                    border:     "1px solid rgba(244,63,94,0.4)",
-                                    color:      "#f43f5e",
-                                }}
-                            >
-                                {reporting ? (
-                                    <span className="flex items-center justify-center gap-2">
-                                        <div className="w-4 h-4 border-2 border-current border-t-transparent rounded-full animate-spin" />
-                                        در حال ارسال...
-                                    </span>
-                                ) : "بله، ریپورت کن"}
-                            </button>
-                        </div>
-                    </div>
-                </div>
-            )}
+            <p className="text-sm leading-6">{comment.content}</p>
         </div>
     );
 }
