@@ -1,19 +1,34 @@
 import React from 'react';
 import logo from "../../assets/logo.png";
 import { useTheme } from '../../../Infrastructure/Contexts/ThemeContext';
+import { useNavigate } from 'react-router-dom';
 
 interface HeaderProps {
   onExit?: () => void;
-  username?: string;
 }
 
 const HEADER_H = 72;
 
 const Header: React.FC<HeaderProps> = ({ 
-  onExit = () => console.log("exit"),
-  username = "نام کاربری"
+  onExit
 }) => {
   const { theme, toggleTheme } = useTheme();
+  const navigate = useNavigate();
+
+  const token = localStorage.getItem("token");
+  const storedUsername = localStorage.getItem("username");
+  const isLoggedIn = !!token;
+
+  const handleAuthAction = () => {
+    if (isLoggedIn) {
+      localStorage.removeItem("token");
+      localStorage.removeItem("username");
+      if (onExit) onExit();
+      window.location.href = "/posts"; 
+    } else {
+      navigate("/login");
+    }
+  };
 
   return (
     <header
@@ -44,7 +59,7 @@ const Header: React.FC<HeaderProps> = ({
             >
               <div className="text-right">
                 <div className="text-sm font-medium" style={{ color: "var(--text-primary)" }}>
-                  {username}
+                  {isLoggedIn ? (storedUsername || "کاربر") : "کاربر مهمان"}
                 </div>
               </div>
               <div
@@ -55,19 +70,9 @@ const Header: React.FC<HeaderProps> = ({
                   color: "var(--text-primary)"
                 }}
               >
-                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" aria-hidden="true">
-                  <path
-                    d="M12 12a4 4 0 1 0-4-4 4 4 0 0 0 4 4Z"
-                    stroke="currentColor"
-                    strokeWidth="1.6"
-                    opacity="0.9"
-                  />
-                  <path
-                    d="M20 20a8 8 0 1 0-16 0"
-                    stroke="currentColor"
-                    strokeWidth="1.6"
-                    opacity="0.9"
-                  />
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none">
+                  <path d="M12 12a4 4 0 1 0-4-4 4 4 0 0 0 4 4Z" stroke="currentColor" strokeWidth="1.6" opacity="0.9" />
+                  <path d="M20 20a8 8 0 1 0-16 0" stroke="currentColor" strokeWidth="1.6" opacity="0.9" />
                 </svg>
               </div>
             </div>
@@ -81,16 +86,14 @@ const Header: React.FC<HeaderProps> = ({
                 border: "1px solid var(--border-soft)",
                 boxShadow: "0 1px 3px rgba(0,0,0,0.08)"
               }}
-              onClick={onExit}
-              title="خروج"
+              onClick={handleAuthAction}
             >
-              خروج
+              {isLoggedIn ? "خروج" : "ورود"}
             </button>
 
             <button
               type="button"
               onClick={toggleTheme}
-              title={theme === "dark" ? "حالت روشن" : "حالت تاریک"}
               className="rounded-full p-2.5 transition-all hover:scale-[1.05]"
               style={{
                 background: "var(--surface-2)",
@@ -101,8 +104,7 @@ const Header: React.FC<HeaderProps> = ({
             >
               {theme === "dark" ? (
                 <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-                  <circle cx="12" cy="12" r="5"/>
-                  <path d="M12 1v2M12 21v2M4.22 4.22l1.42 1.42M18.36 18.36l1.42 1.42M1 12h2M21 12h2M4.22 19.78l1.42-1.42M18.36 5.64l1.42-1.42"/>
+                  <circle cx="12" cy="12" r="5"/><path d="M12 1v2M12 21v2M4.22 4.22l1.42 1.42M18.36 18.36l1.42 1.42M1 12h2M21 12h2M4.22 19.78l1.42-1.42M18.36 5.64l1.42-1.42"/>
                 </svg>
               ) : (
                 <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
