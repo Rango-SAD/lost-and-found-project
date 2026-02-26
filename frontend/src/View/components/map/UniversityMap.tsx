@@ -7,8 +7,24 @@ import { useTheme } from '../../../Infrastructure/Contexts/ThemeContext';
 import { useMapItems } from '../../handlers/useMapItems';
 import { clusterItems, pinSizeFromZoom, labelFontFromZoom } from './mapUtils';
 import { makeClusterIcon, makeLabelIcon } from './mapIcons';
-import { mapRawItemToPost, type MapProps } from '../../../Domain/Types/mapTypes';
+import { mapRawItemToPost, type MapProps, type MapCluster } from '../../../Domain/Types/mapTypes';
 
+const getNearestBuildingName = (lat: number, lng: number) => {
+    if (!BUILDINGS || BUILDINGS.length === 0) return "مکان نامشخص";
+    
+    let nearest = BUILDINGS[0];
+    let minDistance = Math.pow(lat - BUILDINGS[0].pos[0], 2) + Math.pow(lng - BUILDINGS[0].pos[1], 2);
+
+    BUILDINGS.forEach((building) => {
+        const dist = Math.pow(lat - building.pos[0], 2) + Math.pow(lng - building.pos[1], 2);
+        if (dist < minDistance) {
+            minDistance = dist;
+            nearest = building;
+        }
+    });
+    
+    return nearest.name;
+};
 
 function ZoomWatcher({ onZoomChange }: { onZoomChange: (z: number) => void }) {
     const map = useMap();
@@ -46,6 +62,7 @@ function FlyToLocation({ coords }: { coords: { lat: number; lng: number } | null
 
 const UniversityMap: React.FC<MapProps> = ({ selectable, onLocationSelect, showExistingItems }) => {
     const [selectedPostId, setSelectedPostId] = useState<string | null>(null);
+    const [selectedCluster, setSelectedCluster] = useState<MapCluster | null>(null);
     const [zoom, setZoom]                     = useState(16);
     const [flyTarget, setFlyTarget]           = useState<{ lat: number; lng: number } | null>(null);
     const { theme }                           = useTheme();
@@ -69,7 +86,16 @@ const UniversityMap: React.FC<MapProps> = ({ selectable, onLocationSelect, showE
     const selectedPost = useMemo(() => {
         if (!selectedPostId) return null;
         const found = items.find(i => i.id === selectedPostId);
-        return found ? mapRawItemToPost(found) : null;
+        if (!found) return null;
+
+        const post = mapRawItemToPost(found);
+        
+        if (found.location) {
+            const buildingName = getNearestBuildingName(found.location.lat, found.location.lng);
+            (post as any).location = buildingName; 
+        }
+        
+        return post;
     }, [selectedPostId, items]);
 
     const handleMyLocation = useCallback(() => {
@@ -122,10 +148,15 @@ const UniversityMap: React.FC<MapProps> = ({ selectable, onLocationSelect, showE
                             position={[cluster.lat, cluster.lng]}
                             icon={icon}
                             eventHandlers={{
-                                click: () => setSelectedPostId(cluster.items[0].id)
+                                click: () => {
+                                    if (cluster.items.length === 1) {
+                                        setSelectedPostId(cluster.items[0].id);
+                                    } else {
+                                        setSelectedCluster(cluster);
+                                    }
+                                }
                             }}
-                        >
-                        </Marker>
+                        />
                     );
                 })}
             </MapContainer>
@@ -163,6 +194,77 @@ const UniversityMap: React.FC<MapProps> = ({ selectable, onLocationSelect, showE
                 </svg>
                 مکان فعلی من
             </button>
+
+            {selectedCluster && (
+                <div
+                    className="fixed inset-0 z-[999] flex items-center justify-center px-4"
+                    onClick={() => setSelectedCluster(null)}
+                >
+                    <div className="absolute inset-0 bg-black/55 backdrop-blur-sm" />
+                    <div 
+                        onClick={e => e.stopPropagation()}
+                        style={{
+                            background: theme === 'light' ? '#fff' : '#1e293b',
+                            border: '1px solid rgba(255,255,255,0.1)',
+                            borderRadius: '16px',
+                            padding: '24px',
+                            maxWidth: '400px',
+                            width: '100%',
+                            maxHeight: '70vh',
+                            overflow: 'auto',
+                            position: 'relative'
+                        }}
+                    >
+                        <h3 style={{ 
+                            fontSize: '18px', 
+                            fontWeight: '600', 
+                            marginBottom: '16px',
+                            color: theme === 'light' ? '#1e293b' : '#f8fafc',
+                            textAlign: 'center'
+                        }}>
+                            {selectedCluster.items.length} آیتم در این موقعیت
+                        </h3>
+                        <div style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
+                            {selectedCluster.items.map((item) => {
+                                const isLost = item.status?.includes("گم");
+                                return (
+                                    <button
+                                        key={item.id}
+                                        onClick={() => {
+                                            setSelectedPostId(item.id);
+                                            setSelectedCluster(null);
+                                        }}
+                                        style={{
+                                            padding: '16px',
+                                            borderRadius: '12px',
+                                            border: '1px solid rgba(255,255,255,0.1)',
+                                            background: theme === 'light' ? '#f1f5f9' : '#334155',
+                                            cursor: 'pointer',
+                                            textAlign: 'right',
+                                            display: 'flex',
+                                            flexDirection: 'column',
+                                            gap: '8px'
+                                        }}
+                                    >
+                                        <div style={{ display: 'flex', justifyContent: 'space-between' }}>
+                                            <span style={{ fontWeight: '600' }}>{item.title}</span>
+                                            <span style={{
+                                                fontSize: '11px',
+                                                padding: '2px 8px',
+                                                borderRadius: '8px',
+                                                background: isLost ? '#ef4444' : '#10b981',
+                                                color: 'white'
+                                            }}>
+                                                {isLost ? 'گم‌شده' : 'پیدا‌شده'}
+                                            </span>
+                                        </div>
+                                    </button>
+                                );
+                            })}
+                        </div>
+                    </div>
+                </div>
+            )}
 
             {selectedPost && (
                 <div
